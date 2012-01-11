@@ -1,0 +1,7 @@
+#peers {
+	background-color: #fff;
+	text-shadow: #fff 0 1px 0;
+	position: relative;
+	display: block;
+	height: auto;
+}
