@@ -274,14 +274,17 @@ var editorPanel = Ext.widget('form', {
 			text: 'Save',
 			handler: function() {
 				Ext.Ajax.request({
-					method: 'GET',
-					url: 'http://localhost/cgi-bin/src.k',
-					params: 'print "Hello World"',
-					success: function() {
-						Ext.Msg.alert('Saving Completed');
+					method: 'POST',
+					url: 'http://localhost/cgi-bin/save.k',
+					params: {
+						//input: '!!!' + editFile + '!!!' + document.getElementById("textarea").getElementsByTagName("textarea")[0].value
+						input: document.getElementById("textarea").getElementsByTagName("textarea")[0].value
+					},
+					success: function(result) {
+						Ext.Msg.alert(result.responseText);
 					},
 					failure: function() {
-						Ext.Msg.alert('Saving Failed');
+						Ext.Msg.alert('POST Failed');
 					},
 				});
 			}
@@ -292,11 +295,14 @@ var editorPanel = Ext.widget('form', {
 			text: 'Load',
 			handler: function() {
 				Ext.Ajax.request({
-					method: 'GET',
-					url: 'http://localhost/cgi-bin/src.k',
-					params: 'print "Hello World"',
-					success: function() {
+					method: 'POST',
+					url: 'http://localhost/cgi-bin/load.k',
+					params: {
+						input: '',
+					},
+					success: function(result) {
 						Ext.Msg.alert('Loading Completed');
+						document.getElementById("textarea").getElementsByTagName("textarea")[0].value = result.responseText;
 					},
 					failure: function() {
 						Ext.Msg.alert('Loading Failed');
