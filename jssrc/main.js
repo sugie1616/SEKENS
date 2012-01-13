@@ -4,6 +4,10 @@ Ext.Loader.setPath('Ext.ux.DataView', '../ext-4.0.7/example/ux/DataView');
 Ext.require(['*']);
 Ext.onReady(function() {
 Ext.tip.QuickTipManager.init();
+
+var userName = 'Gest User';
+var editFile = 'test.k';
+
 var formPanel = Ext.widget('form', {
 	renderTo: Ext.getBody(),
 	id: 'accountFormPanel',
@@ -56,6 +60,7 @@ var formPanel = Ext.widget('form', {
 	{
 		xtype: 'textfield',
 		name: 'username',
+		id: 'username',
 		emptyText: 'User Name',
 		//fieldLabel: 'User Name',
 		allowBlank: false,
@@ -80,9 +85,8 @@ var formPanel = Ext.widget('form', {
 	{
 		xtype: 'textfield',
 		name: 'password1',
-		//fieldLabel: 'Password',
+		id: 'password1',
 		inputType: 'password',
-		//style: 'margin-top:15px',
 		allowBlank: false,
 		minLength: 8
 	},
@@ -93,7 +97,7 @@ var formPanel = Ext.widget('form', {
 	{
 		xtype: 'textfield',
 		name: 'password2',
-		//fieldLabel: 'Repeat Password',
+		id: 'password2',
 		inputType: 'password',
 		allowBlank: false,
 		validator: function(value) {
@@ -101,6 +105,16 @@ var formPanel = Ext.widget('form', {
 			return (value === password1.getValue()) ? true : 'Passwords do not match.'
 		}
 	},
+	{
+		xtype: 'displayfield',
+		value: 'Debug:',
+	},
+	{
+		xtype: 'textfield',
+		name: 'debug',
+		id: 'debug',
+	},
+
 	],
 
 	dockedItems: [{
@@ -170,38 +184,37 @@ var formPanel = Ext.widget('form', {
 			text: 'Register!',
 			width: 80,
 			handler: function() {
+				var debugEl = Ext.get("debug");
 				var form = formPanel.getForm();
 				Ext.Ajax.request({
 					method: 'GET',
 					url: 'http://localhost/cgi-bin/register.k',
 					params: form.getValues(true),
-					success: function() {
-						Ext.Msg.alert('Registratin Completed');
+					success: function(result) {
+						debugEl.dom.innerHTML = result.responseText;
 					},
 					failure: function() {
-						Ext.Msg.alert('Registratin Failed');
 					},
 				});
-			}
+			},
 		},
 		{
 			xtype: 'button',
 			formBind: true,
 			disabled: true,
-			id: 'loginButton',
 			text: 'Login',
 			width: 80,
 			handler: function() {
+				var debugEl = Ext.get("debug");
+				var form = formPanel.getForm();
 				Ext.Ajax.request({
 					method: 'GET',
 					url: 'http://localhost/cgi-bin/login.k',
-					params: formPanel.getForm(),
-					success: function() {
-						document.getElementById('accountFormPanel').getElementsByTagName("accountFormPanel")[0].hide();
-						//Ext.Msg.alert('Login Completed');
+					params: form.getValues(true),
+					success: function(result) {
+						debugEl.dom.innerHTML = result.responseText;
 					},
 					failure: function() {
-						Ext.Msg.alert('Login Failed');
 					},
 				});
 			}
@@ -224,7 +237,7 @@ var editorPanel = Ext.widget('form', {
 		{
 			xtype: 'displayfield',
 			name: 'textarealabel',
-			fieldLabel: 'TextArea',
+			fieldLabel: editFile,
 			value: ''
 		},
 		{
@@ -437,12 +450,13 @@ var searchPanel = Ext.create('Ext.form.Panel', {
 	handler: function() {
 		Ext.Ajax.request({
 			method: 'POST',
-		url: 'http://localhost/cgi-bin/usr.k',
-		params: {
+			url: 'http://localhost/cgi-bin/search.k',
+			params: {
 			input: document.getElementById("findTextArea").getElementsByTagName("findTextArea")[0].value
 		},
-		success: function() {
+		success: function(result) {
 			Ext.Msg.alert('Search Completed');
+			input: document.getElementById("searchdebug").getElementsByTagName("searchdebug")[0].value = result.responseText;
 		},
 		failure: function() {
 			Ext.Msg.alert('Search Failed');
@@ -450,9 +464,20 @@ var searchPanel = Ext.create('Ext.form.Panel', {
 		});
 	}
 },
+{
+		xtype: 'displayfield',
+		value: 'Debug:',
+	},
+	{
+		xtype: 'textfield',
+		name: 'searchdebug',
+		id: 'searchdebug',
+	},
+
 	],
 });
 
+//north panel
 var northPanel = Ext.create('Ext.panel.Panel', {
 	frame: true,
 	split: true,
@@ -473,9 +498,13 @@ var centerPanel = Ext.create('Ext.panel.Panel', {
 	//collapsible: true,
 	//animCollapse: true,
 	margins: '0 0 0 5',
-	title: 'User',
+	title: userName,
 	region:'center',
 	items:[
+	{
+		xtype: 'displayfield',
+		value: 'Welcome, ' + userName,
+	},
 	menuPanel,
 	]
 });
