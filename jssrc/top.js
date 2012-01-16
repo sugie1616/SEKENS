@@ -205,13 +205,16 @@ var formPanel = Ext.widget('form', {
 				var form = formPanel.getForm();
 				Ext.Ajax.request({
 					method: 'GET',
-					url: 'http://localhost/cgi-bin/login.k',
+					url: 'http://localhost/SEKENS/cgi-bin/login.k',
 					params: form.getValues(true),
 					success: function(result) {
 						debugEl.dom.innerHTML = result.responseText;
 						userName = 'sugimoto';
-						//<script type = "text/javascript" src = "main.js"></script>
-						document.location = "http://localhost/SEKENS/home";
+						//if (result.responseText == "OK") {
+							document.location = "http://localhost/SEKENS/home";
+						//}
+						//else {
+						//}
 					},
 					failure: function() {
 					},

@@ -12,8 +12,8 @@ String qStr = $env.QUERY_STRING;
 String[] map = qStr.split("&");
 String uName = map[1].replace("username=", "");
 String password = map[2].replace("password1=", "");
-OUT << uName << EOL;
-OUT << password << EOL;
+//OUT << uName << EOL;
+//OUT << password << EOL;
 
 while (rSet.next()) {
 	if (uName == rSet.getString("NAME") && password == rSet.getString("PASSWORD")) {
@@ -23,13 +23,13 @@ while (rSet.next()) {
 }
 
 if (doubly == true) {
-	print "Login completed";
+	OUT << "OK" << EOL;
 	/*
 		
 	*/
 }
 else {
-	print "Login failed";
+	OUT << "RETAKE" << EOL;
 	/*
 		
 	*/
