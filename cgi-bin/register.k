@@ -1,37 +1,57 @@
 #!/usr/local/bin/konoha
 
+using konoha.uuid.*;
 using konoha.sql.*;
 
 OUT << "Content-Type: text/plain" << EOL << EOL;
 
-boolean doubly = false; //true = doubling
-Connection con = new Connection("./users/users.sqlite3");
-ResultSet rSet = con.query("select * from user");
+class Register
+{
 
-String qStr = $env.QUERY_STRING;
-String[] map = qStr.split("&");
-String uName = map[1].replace("username=", "");
-String password = map[2].replace("password1=", "");
-OUT << uName << EOL;
-OUT << password << EOL;
+	String qStr;
+	String uName;
+	String password;
+	boolean doubly = false; //true = doubling
+	Connection con;
+	ResultSet rSet;
 
-while (rSet.next()) {
-	if (uName == rSet.getString("NAME") && password == rSet.getString("PASSWORD")) {
-		doubly = true;
-		break;
+	Register() {
+		_qStr = $env.QUERY_STRING;
+		String[] map = qStr.split("&");
+		_uName = map[1].replace("username=", "");
+		_password = map[2].replace("password1=", "");
+		_con = new Connection("users/users.sqlite3");
+		_rSet = con.query("select * from user");
+	}
+
+	void check() {
+		while (rSet.next()) {
+			if (uName == rSet.getString("NAME")) {
+				doubly = true;
+				break;
+			}
+		}
+	}
+
+	void registerUser(boolean doubly) {
+		if (doubly == true) {
+			OUT << "Register failed" << EOL;
+		}
+		else {
+			String dbq = "insert into user values('";
+			dbq += uName + "' , '" + password + "');";
+			//OUT << dbq << EOL;
+			con.exec(dbq);
+			OUT << "Register completed" << EOL;
+		}
+		print doubly;
 	}
 }
 
-if (doubly == true) {
-	print "Register failed";
+void main() {
+	Register reg = new Register();
+	reg.check();
+	reg.registerUser();
+	reg.rSet.close();
+	reg.con.close();
 }
-else {
-	String dbq = "insert into user values('";
-	dbq += uName + "' , '" + password + "');";
-	print dbq;
-	con.exec(dbq);
-	print "Register completed";
-}
-
-rSet.close();
-con.close();

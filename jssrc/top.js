@@ -11,7 +11,8 @@ var formPanel = Ext.widget('form', {
 	width: 200,
 	bodyPadding: 10,
 	bodyBorder: true,
-	title: 'Account Registration',
+	title: 'Registration',
+	region: 'center',
 
 	defaults: {
 		anchor: '100%'
@@ -184,7 +185,7 @@ var formPanel = Ext.widget('form', {
 				var form = formPanel.getForm();
 				Ext.Ajax.request({
 					method: 'GET',
-					url: 'http://localhost/cgi-bin/register.k',
+					url: './cgi-bin/register.k',
 					params: form.getValues(true),
 					success: function(result) {
 						debugEl.dom.innerHTML = result.responseText;
@@ -205,13 +206,13 @@ var formPanel = Ext.widget('form', {
 				var form = formPanel.getForm();
 				Ext.Ajax.request({
 					method: 'GET',
-					url: 'http://localhost/SEKENS/cgi-bin/login.k',
+					url: './cgi-bin/login.k',
 					params: form.getValues(true),
 					success: function(result) {
 						debugEl.dom.innerHTML = result.responseText;
 						userName = 'sugimoto';
 						//if (result.responseText == "OK") {
-							document.location = "http://localhost/SEKENS/home";
+						//document.location = "http://localhost/SEKENS/home/";
 						//}
 						//else {
 						//}

@@ -1,4 +1,3 @@
-//aaa
 int fibo(int n) {
 	if (n < 3) {
 		return 1;
@@ -8,5 +7,5 @@ int fibo(int n) {
 	}
 }
 
-int i = 36;
+int i = 10;
 print fibo(i);

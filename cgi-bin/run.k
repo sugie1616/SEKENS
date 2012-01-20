@@ -4,17 +4,70 @@ using konoha.conv.*;
 using konoha.io.*;
 
 OUT << "Content-Type: text/plain" << EOL << EOL;
-//content_length = (to Int)$env.CONTENT_LENGTH;
-//print content_length;
-//buf = new byte[content_length];
-//IN.read(buf, 0, content_length);
-//script = buf.decode();
-//
-//for (i = 0; i < content_length; i++) {
-//	print buf[i];
+
+class Run
+{
+	String srcDir;
+	String newCode,oldCode;
+	boolean updateSrc = false;//true = updated
+
+	Run() {
+		_srcDir = "./uSrcs/sugimoto/test.k";
+		_newCode = readLine().replace("input=", "");
+		_newCode = newCode.convert(to:durl);
+		InputStream ins = new InputStream(srcDir);
+		foreach (String str in ins) {
+			_oldCode += str + "\n";
+		}
+		print oldCode;
+		print newCode;
+	}
+	
+	boolean checkUpdateSrc() {
+		if (newCode == oldCode) {
+			print "code is NOT changed";
+			//OUT << exec("/usr/local/bin/konohac --emit-js" + " " + srcDir) << EOL;
+			return updateSrc;
+		}
+		else {
+			print "code is changed";
+			updateSrc = true;
+			return updateSrc;
+		}
+	}
+	
+	void evalKonoha(boolean updateSrc) {
+		if (updateSrc == true) {
+			OutputStream out = new OutputStream("./uSrcs/sugimoto/newTest.k");
+			out.print(newCode);
+			out.flush();
+			//OUT << exec("/usr/local/bin/konohac --emit-js" + " " + "./uSrcs/sugimoto/newTest.k") << EOL;
+		}
+	}
+
+}
+//String srcDir = "./uSrcs/sugimoto/test.k";
+//String newCode,oldCode;
+//newCode = readLine().replace("input=", "");
+//newCode = newCode.convert(to:durl);
+
+//InputStream ins = new InputStream(srcDir);
+//foreach (String str in ins) {
+//	oldCode += str + "\n";
 //}
-//
-String script;// = IN.readLine();
-String script = readLine().replace("input=", "");
-script = script.convert(to:durl);
-eval(script);
+//print oldCode;
+//print newCode;
+//if (newCode == oldCode) {
+//	//OUT << exec("/usr/local/bin/konohac --emit-js" + " " + srcDir) << EOL;
+//}
+//else {
+//	print "code is changed";
+//	OutputStream out = new OutputStream(srcDir);
+//	out.print(newCode);
+//	out.flush();
+//	//OUT << exec("/usr/local/bin/konohac --emit-js" + " " + srcDir) << EOL;
+//}
+void main() {
+	Run run = new Run();
+	run.evalKonoha(run.checkUpdateSrc());
+}

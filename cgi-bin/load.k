@@ -5,7 +5,7 @@ using konoha.conv.*;
 
 OUT << "Content-Type: text/plain" << EOL << EOL;
 
-InputStream ins = new InputStream("./uSrcs/test2.k");
+InputStream ins = new InputStream("./uSrcs/sugimoto/test.k");
 foreach (String str in ins) {
 	OUT << str << EOL;
 }

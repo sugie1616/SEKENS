@@ -40,7 +40,7 @@ var editorPanel = Ext.widget('form', {
 			handler: function() {
 				Ext.Ajax.request({
 					method: 'POST',
-					url: 'http://localhost/cgi-bin/run.k',
+					url: '../cgi-bin/run.k',
 					params: {
 						input: document.getElementById("textarea").getElementsByTagName("textarea")[0].value
 					},
@@ -60,7 +60,7 @@ var editorPanel = Ext.widget('form', {
 			handler: function() {
 				Ext.Ajax.request({
 					method: 'POST',
-					url: 'http://localhost/cgi-bin/save.k',
+					url: '../cgi-bin/save.k',
 					params: {
 						input: 'sugimoto' + '!!!' + document.getElementById("textarea").getElementsByTagName("textarea")[0].value
 					},
@@ -80,7 +80,7 @@ var editorPanel = Ext.widget('form', {
 			handler: function() {
 				Ext.Ajax.request({
 					method: 'POST',
-					url: 'http://localhost/cgi-bin/load.k',
+					url: '../cgi-bin/load.k',
 					params: {
 						input: '',
 					},
@@ -179,93 +179,107 @@ var peersView = Ext.create('Ext.view.View', {
 var menuPanel = Ext.create('Ext.tab.Panel', {
 	frame: true,
 	items: [
-	    editorPanel,
-	    {
+		editorPanel,
+		{
 		xtype: 'panel',
 		title: 'Group',
-		html: 'Your Active Group',
-		closable: false
-	    },
-	    {
-		xtype: 'panel',
-		title: 'Peers',
-		html: 'Your Added Friends',
-		closable: false
-	    },
-	    {
-		xtype: 'panel',
-		title: 'Data',
-		html: 'User Data',
-		closable: false
-	    },
-	    {
-		xtype: 'panel',
-		title: 'Peers',
 		closable: false,
 		items: [
 		    peersView,
 		]
-	    },
+		},
+		{
+		xtype: 'panel',
+		title: 'Directory',
+		html: 'User Directory',
+		closable: false
+		},
+	//Ext.BLANK_IMAGE_URL = '../ext-4.0.7/resources/themes/images/default/tree/s.gif';
+//		var dirTreePanel = new Ext.tree.TreePanel({
+//			title: 'Directory',
+//		root: {
+//			text: 'Problem',
+//			id: 'root',
+//			expanded: true,
+//			children: [
+//			{
+//				id: 'test1.k',
+//				text: 'test1',
+//				leaf: true,
+//			},
+//			{
+//				id: 'test2.k',
+//				text: 'test2',
+//				leaf: true,
+//			},
+//			{
+//				id: 'test3.k',
+//				text: 'test3',
+//				leaf: true,
+//			},
+//			]
+//		}
+//		});
 	],
 });
 
-var searchPanel = Ext.create('Ext.form.Panel', {
-	title: 'Search',
-	frame: true,
-	split: 'true',
-	margins: '5 0 0 5',
-	items: [
-{
-	xtype: 'displayfield',
-	value: 'Search Object:',
-},
-{
-	xtype: 'textfield',
-	name: 'findTextArea',
-	id: 'findTextArea',
-	emptyText: 'Object Name',
-},
-{
-	xtype: 'checkboxgroup',
-	cls: 'x-check-group-alt',
-	items: [
-		{boxLabel: 'Student', name: 'studentCB', checked: true},
-		{boxLabel: 'Teacher', name: 'teacherCB'},
-		{boxLabel: 'Group', name: 'groupCB'},
-	],
-	},
-{
-	xtype: 'button',
-	text: 'Search',
-	handler: function() {
-		Ext.Ajax.request({
-			method: 'POST',
-			url: 'http://localhost/cgi-bin/search.k',
-			params: {
-			input: document.getElementById("findTextArea").getElementsByTagName("findTextArea")[0].value
-		},
-		success: function(result) {
-			Ext.Msg.alert('Search Completed');
-			input: document.getElementById("searchdebug").getElementsByTagName("searchdebug")[0].value = result.responseText;
-		},
-		failure: function() {
-			Ext.Msg.alert('Search Failed');
-		},
-		});
-	}
-},
-{
-		xtype: 'displayfield',
-		value: 'Debug:',
-	},
-	{
-		xtype: 'textfield',
-		name: 'searchdebug',
-		id: 'searchdebug',
-	},
-
-	],
-});
+//var searchPanel = Ext.create('Ext.form.Panel', {
+//	title: 'Search',
+//	frame: true,
+//	split: 'true',
+//	margins: '5 0 0 5',
+//	items: [
+//{
+//	xtype: 'displayfield',
+//	value: 'Search Object:',
+//},
+//{
+//	xtype: 'textfield',
+//	name: 'findTextArea',
+//	id: 'findTextArea',
+//	emptyText: 'Object Name',
+//},
+//{
+//	xtype: 'checkboxgroup',
+//	cls: 'x-check-group-alt',
+//	items: [
+//		{boxLabel: 'Student', name: 'studentCB', checked: true},
+//		{boxLabel: 'Teacher', name: 'teacherCB'},
+//		{boxLabel: 'Group', name: 'groupCB'},
+//	],
+//	},
+//{
+//	xtype: 'button',
+//	text: 'Search',
+//	handler: function() {
+//		Ext.Ajax.request({
+//			method: 'POST',
+//			url: 'http://localhost/cgi-bin/search.k',
+//			params: {
+//			input: document.getElementById("findTextArea").getElementsByTagName("findTextArea")[0].value
+//		},
+//		success: function(result) {
+//			Ext.Msg.alert('Search Completed');
+//			input: document.getElementById("searchdebug").getElementsByTagName("searchdebug")[0].value = result.responseText;
+//		},
+//		failure: function() {
+//			Ext.Msg.alert('Search Failed');
+//		},
+//		});
+//	}
+//},
+//{
+//		xtype: 'displayfield',
+//		value: 'Debug:',
+//	},
+//	{
+//		xtype: 'textfield',
+//		name: 'searchdebug',
+//		id: 'searchdebug',
+//	},
+//
+//	],
+//});
 
 //north panel
 var northPanel = Ext.create('Ext.panel.Panel', {
@@ -328,7 +342,6 @@ var eastPanel = Ext.create('Ext.panel.Panel',{
 	animCollapse: true,
 	margins: '0 0 0 5',
 	items:[
-	//findPanel,
 	],
 });
 new Ext.Viewport({
