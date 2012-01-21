@@ -46,27 +46,7 @@ class Run
 	}
 
 }
-//String srcDir = "./uSrcs/sugimoto/test.k";
-//String newCode,oldCode;
-//newCode = readLine().replace("input=", "");
-//newCode = newCode.convert(to:durl);
 
-//InputStream ins = new InputStream(srcDir);
-//foreach (String str in ins) {
-//	oldCode += str + "\n";
-//}
-//print oldCode;
-//print newCode;
-//if (newCode == oldCode) {
-//	//OUT << exec("/usr/local/bin/konohac --emit-js" + " " + srcDir) << EOL;
-//}
-//else {
-//	print "code is changed";
-//	OutputStream out = new OutputStream(srcDir);
-//	out.print(newCode);
-//	out.flush();
-//	//OUT << exec("/usr/local/bin/konohac --emit-js" + " " + srcDir) << EOL;
-//}
 void main() {
 	Run run = new Run();
 	run.evalKonoha(run.checkUpdateSrc());

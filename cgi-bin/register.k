@@ -24,7 +24,7 @@ class Register
 		_rSet = con.query("select * from user");
 	}
 
-	void check() {
+	void regCheck() {
 		while (rSet.next()) {
 			if (uName == rSet.getString("NAME")) {
 				doubly = true;
@@ -50,7 +50,7 @@ class Register
 
 void main() {
 	Register reg = new Register();
-	reg.check();
+	reg.regCheck();
 	reg.registerUser();
 	reg.rSet.close();
 	reg.con.close();

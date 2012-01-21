@@ -25,7 +25,7 @@ class LoginManager
 		_rSet = con.query("select * from user");
 	}
 
-	void check() {
+	void loginCheck() {
 		while (rSet.next()) {
 			if (uName == rSet.getString("NAME") && password == rSet.getString("PASSWORD")) {
 				doubly = true;
@@ -33,33 +33,22 @@ class LoginManager
 			}
 		}
 	}
-
-
-	void saveCookie() {
-		cookie = new Cookie();
-		cookie["key"] = "val";
-		cookie["key"]["expires"] = "exp";
-		cookie["key"]["path"] = "/";
-		OUT << cookie.dump() << EOL;
-	}
 	
 	void login() {
 		if (doubly == true) {
 			OUT << "OK" << EOL;
-			saveCookie();
+			//page change !!
 		}
 		else {
 			OUT << "RETAKE" << EOL;
 		}
 	}
 
-
 }
 
 void main() {
 	LoginManager lMan = new LoginManager();
-	print $env.HTTP_COOKIE;
-	lMan.check();
+	lMan.loginCheck();
 	lMan.login();
 	lMan.rSet.close();
 	lMan.con.close();
