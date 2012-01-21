@@ -33,12 +33,27 @@ class SEKENS
 		return Uuid.getUuid4();
 	}
 	
-	boolean hasCookie(String sid) {
+	boolean checkCookie(String sid) {
 		if () {
+			//cookie OK
 			return true;
 		}
 		else {
+			//cookie NG
 			return false;
+		}
+	}
+	
+	void changePage() {
+		if () {
+			/*
+			top.js
+			*/
+		}
+		else {
+			/*
+			main.js
+			*/
 		}
 	}
 }
