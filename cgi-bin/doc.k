@@ -28,7 +28,6 @@ void main()
 	if (cookie["SID"] != null) {
 		OUT << "Conten-Type: text/html\n" << EOL << EOL;
 		html = html.replace("top.js", main.js);
-		
 		OUT << html;
 	}
 	else {
