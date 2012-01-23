@@ -110,6 +110,7 @@ var formPanel = Ext.widget('form', {
 		xtype: 'textfield',
 		name: 'debug',
 		id: 'debug',
+		height: 300,
 	},
 
 	],
@@ -185,7 +186,7 @@ var formPanel = Ext.widget('form', {
 				var form = formPanel.getForm();
 				Ext.Ajax.request({
 					method: 'GET',
-					url: './cgi-bin/register.k',
+					url: './register.k',
 					params: form.getValues(true),
 					success: function(result) {
 						debugEl.dom.innerHTML = result.responseText;
@@ -206,16 +207,11 @@ var formPanel = Ext.widget('form', {
 				var form = formPanel.getForm();
 				Ext.Ajax.request({
 					method: 'GET',
-					url: './cgi-bin/login.k',
+					url: './login.k',
 					params: form.getValues(true),
 					success: function(result) {
-						debugEl.dom.innerHTML = result.responseText;
+						form.findField('debug').setValue(result.responseText);
 						userName = 'sugimoto';
-						//if (result.responseText == "OK") {
-						//document.location = "http://localhost/SEKENS/home/";
-						//}
-						//else {
-						//}
 					},
 					failure: function() {
 					},
