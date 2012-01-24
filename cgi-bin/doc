@@ -1,0 +1,37 @@
+#!/usr/local/bin/konoha
+
+using konoha.cookie.*;
+include "SEKENS.k";
+
+String html = """
+	<!DOCTYPE html>
+	<html lang="ja">
+		<head>
+			<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+			<title>SEKENS</title>
+			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/resources/css/ext-all.css"/>
+			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/examples/shared/example.css"/>
+			<link rel="stylesheet" type="text/css" href="../resources/peers.css"/>
+			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/examples/ux/DataView/DragSelector.css" />
+			<script type="text/javascript" src="../ext-4.0.7/bootstrap.js"></script>
+			<script type="text/javascript" src="../jssrc/top.js"></script>
+		</head>
+		<body>
+		</body>
+	</html>"""
+
+void main()
+{
+	SEKENS sekens = new SEKENS();
+	Cookie cookie = new Cookie($env.HTTP_COOKIE);
+	if (cookie["SID"] != null) {
+	OUT << "Content-Type: text/html\n" << EOL << EOL;
+		html = html.replace("top.js", "main.js");
+	}
+	else {
+	OUT << "Content-Type: text/html\n" << EOL << EOL;
+	}
+
+	OUT << html;
+	OUT.flush();
+}
