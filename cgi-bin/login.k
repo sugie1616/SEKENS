@@ -1,7 +1,6 @@
 #!/usr/local/bin/konoha
 
-using konoha.sql.*;
-using konoha.cookie.*;
+include "SEKENS.k";
 
 OUT << "Content-Type: text/plain" << EOL << EOL;
 
@@ -11,10 +10,8 @@ class LoginManager
 	String qStr;
 	String uName;
 	String password;
-	boolean doubly = false; //true = doubling
 	ResultSet rSet;
 	Connection con;
-	Cookie cookie;
 
 	LoginManager() {
 		_qStr = $env.QUERY_STRING;
@@ -25,22 +22,29 @@ class LoginManager
 		_rSet = con.query("select * from user");
 	}
 
-	void loginCheck() {
+	boolean loginCheck() {
+		boolean doubly = false;
 		while (rSet.next()) {
 			if (uName == rSet.getString("NAME") && password == rSet.getString("PASSWORD")) {
 				doubly = true;
 				break;
 			}
 		}
+		return doubly;
 	}
 	
-	void login() {
-		if (doubly == true) {
-			OUT << "OK" << EOL;
-			//page change !!
+	void login(String userName) {
+		if (loginCheck() == true) {
+			//OUT << "OK" << EOL;
+			SEKENS sekens = new SEKENS();
+			String sid = sekens.generateSid();
+			sekens.setSID(userName, sid);
+			sekens.saveCookie("SID", sid);
+			
+			OUT << "Content-Type: text/html" << EOL << EOL;
 		}
 		else {
-			OUT << "RETAKE" << EOL;
+			OUT << "PLEASE RETAKE" << EOL;
 		}
 	}
 
@@ -48,8 +52,7 @@ class LoginManager
 
 void main() {
 	LoginManager lMan = new LoginManager();
-	lMan.loginCheck();
-	lMan.login();
+	lMan.login(lMan.uName);
 	lMan.rSet.close();
 	lMan.con.close();
 }

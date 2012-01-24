@@ -2,6 +2,7 @@
 
 using konoha.uuid.*;
 using konoha.sql.*;
+include "SEKENS.k";
 
 OUT << "Content-Type: text/plain" << EOL << EOL;
 
@@ -44,14 +45,13 @@ class Register
 			con.exec(dbq);
 			OUT << "Register completed" << EOL;
 		}
-		print doubly;
 	}
 }
 
 void main() {
 	Register reg = new Register();
 	reg.regCheck();
-	reg.registerUser();
+	reg.registerUser(reg.doubly);
 	reg.rSet.close();
 	reg.con.close();
 }
