@@ -5,8 +5,9 @@ Ext.require(['*']);
 Ext.onReady(function() {
 Ext.tip.QuickTipManager.init();
 
-var userName = 'Gest User';
+var userName = 'sugimoto';
 var editFile = 'test.k';
+var homeURL = 'http://localhost/SEKENS/';
 
 var editorPanel = Ext.widget('form', {
 	title: 'Editor',
@@ -40,7 +41,7 @@ var editorPanel = Ext.widget('form', {
 			handler: function() {
 				Ext.Ajax.request({
 					method: 'POST',
-					url: './cgi-bin/run.k',
+					url: homeURL + 'cgi-bin/run.k',
 					params: {
 						input: editorPanel.getForm().getValues().textarea,
 					},
@@ -60,7 +61,7 @@ var editorPanel = Ext.widget('form', {
 			handler: function() {
 				Ext.Ajax.request({
 					method: 'POST',
-					url: './cgi-bin/save.k',
+					url: homeURL + 'cgi-bin/save.k',
 					params: {
 						input: editorPanel.getForm().getValues().textarea,
 					},
@@ -80,7 +81,7 @@ var editorPanel = Ext.widget('form', {
 			handler: function() {
 				Ext.Ajax.request({
 					method: 'POST',
-					url: './cgi-bin/load.k',
+					url: homeURL + 'cgi-bin/load.k',
 					params: {
 						input: '',
 					},
@@ -273,8 +274,6 @@ var northPanel = Ext.create('Ext.panel.Panel', {
 var centerPanel = Ext.create('Ext.panel.Panel', {
 	frame: true,
 	split: true,
-	//collapsible: true,
-	//animCollapse: true,
 	margins: '0 0 0 5',
 	title: userName,
 	region:'center',
@@ -282,6 +281,23 @@ var centerPanel = Ext.create('Ext.panel.Panel', {
 	{
 		xtype: 'displayfield',
 		value: 'Welcome, ' + userName,
+	},
+	{
+		xtype: 'button',
+		text: 'Logout',
+		handler: function() {
+			Ext.Ajax.request({
+				method: 'GET',
+				url: homeURL + 'cgi-bin/logout.k',
+				params: 'sugimoto',
+				success: function(result) {
+					Ext.Msg.alert('Logout Completed');
+				},
+				failure: function() {
+					Ext.Msg.alert('Logout Failed');
+				},
+			});
+		},
 	},
 	menuPanel,
 	]

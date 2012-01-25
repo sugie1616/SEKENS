@@ -12,7 +12,7 @@ class Register
 	String qStr;
 	String uName;
 	String password;
-	boolean doubly = false; //true = doubling
+	String usr_file = "../resources/users/users.sqlite3";
 	Connection con;
 	ResultSet rSet;
 
@@ -21,17 +21,19 @@ class Register
 		String[] map = qStr.split("&");
 		_uName = map[1].replace("username=", "");
 		_password = map[2].replace("password1=", "");
-		_con = new Connection("users/users.sqlite3");
+		_con = new Connection(usr_file);
 		_rSet = con.query("select * from user");
 	}
 
-	void regCheck() {
+	boolean regCheck() {
+		boolean doubly = false;
 		while (rSet.next()) {
 			if (uName == rSet.getString("NAME")) {
 				doubly = true;
 				break;
 			}
 		}
+		return doubly;
 	}
 
 	void registerUser(boolean doubly) {
@@ -41,7 +43,6 @@ class Register
 		else {
 			String dbq = "insert into user values('";
 			dbq += uName + "' , '" + password + "');";
-			//OUT << dbq << EOL;
 			con.exec(dbq);
 			OUT << "Register completed" << EOL;
 		}
@@ -50,8 +51,7 @@ class Register
 
 void main() {
 	Register reg = new Register();
-	reg.regCheck();
-	reg.registerUser(reg.doubly);
+	reg.registerUser(reg.regCheck());
 	reg.rSet.close();
 	reg.con.close();
 }

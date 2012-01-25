@@ -10,6 +10,7 @@ class LoginManager
 	String qStr;
 	String uName;
 	String password;
+	String usr_file = "../resources/users/users.sqlite3";
 	ResultSet rSet;
 	Connection con;
 
@@ -18,7 +19,7 @@ class LoginManager
 		String[] map = qStr.split("&");
 		_uName = map[1].replace("username=", "");
 		_password = map[2].replace("password1=", "");
-		_con = new Connection("users/users.sqlite3");
+		_con = new Connection(usr_file);
 		_rSet = con.query("select * from user");
 	}
 
@@ -42,6 +43,10 @@ class LoginManager
 			sekens.saveCookie("SID", sid);
 			
 			OUT << "Content-Type: text/html" << EOL << EOL;
+			
+			Json j = new Json();
+			j["SID"] = sid;
+			OUT << j.stringify() << EOL;
 		}
 		else {
 			OUT << "PLEASE RETAKE" << EOL;

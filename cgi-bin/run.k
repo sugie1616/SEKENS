@@ -7,12 +7,10 @@ OUT << "Content-Type: text/plain" << EOL << EOL;
 
 class Run
 {
-	String srcDir;
+	String srcDir = "../resources/uSrcs/sugimoto/test.k";
 	String newCode,oldCode;
-	boolean updateSrc = false;//true = updated
 
 	Run() {
-		_srcDir = "./uSrcs/sugimoto/test.k";
 		_newCode = readLine().replace("input=", "");
 		_newCode = newCode.convert(to:durl);
 		InputStream ins = new InputStream(srcDir);
@@ -24,16 +22,16 @@ class Run
 	}
 	
 	boolean checkUpdateSrc() {
+		boolean updateSrc = false;//true = updated
 		if (newCode == oldCode) {
 			print "code is NOT changed";
 			//OUT << exec("/usr/local/bin/konohac --emit-js" + " " + srcDir) << EOL;
-			return updateSrc;
 		}
 		else {
 			print "code is changed";
 			updateSrc = true;
-			return updateSrc;
 		}
+		return updateSrc;
 	}
 	
 	void evalKonoha(boolean updateSrc) {
