@@ -4,8 +4,8 @@ include "SEKENS.k";
 
 void main()
 {
-	String html = HTML;
 	SEKENS sekens = new SEKENS();
+	String html = sekens.html;
 	Cookie cookie = new Cookie($env.HTTP_COOKIE);
 	if (cookie["SID"] != null) {
 	}
@@ -13,7 +13,7 @@ void main()
 		//html = html.replace("top.js", "main.js");
 	}
 	
-	OUT << "Content-Type: text/html\n" << EOL << EOL;
+	OUT << "Content-Type: text/html\n" << EOL;
 	OUT << html;
 	OUT.flush();
 }

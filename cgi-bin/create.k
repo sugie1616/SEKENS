@@ -51,13 +51,13 @@ void main(String[] args)
 	String user_dir = G_USER_DIR + "chen_ji" + "/";
 
 	String create_dir = user_dir + repo_title + "/";
-	if (mkdir(create_dir, 0755) == false) {
+	if (mkdir(create_dir, 0775) == false) {
 		OUT << err2json("mkdir '" + create_dir + "' failed") << EOL;
 		return;
 	}
 
 	String create_gitdir = create_dir + ".git";
-	if (mkdir(create_gitdir, 0755) == false) {
+	if (mkdir(create_gitdir, 0775) == false) {
 		OUT << err2json("mkdir '" + create_gitdir + "' failed") << EOL;
 		return;
 	}

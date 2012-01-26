@@ -1,21 +1,13 @@
 #!/usr/local/bin/konoha
 
 using konoha.uuid.*;
-using konoha.cookie.*;
 using konoha.sql.*;
-using konoha.json.*;
 include "settings.k";
+include "cgi.k";
 
-OK = true;
-NG = false;
-USER_NAME = "";
-USER_SID = "";
-USER_GIT_REPO_DIR = "";
-CURRENT_DIR = "";
-EDIT_FILE_NAME = "";
-PAST_DATE = "Thu, 01 Jan 1970 00:00:00 GMT";
-EXPIRES = "Thu, 28 Feb 2012 00:00:00 GMT";
-HTML = """
+class SEKENS
+{
+	String html = """
 	<!DOCTYPE html>
 	<html lang="ja">
 		<head>
@@ -31,31 +23,24 @@ HTML = """
 		</head>
 		<body>
 		</body>
-	</html>"""
-
-class SEKENS
-{
+	</html>""";
 	Connection con;
 	ResultSet rSet;
 
 	SEKENS() {
 		_con = new Connection(G_USER_DB);
-		_rSet = con.query("select * from user");
 	}
 
 	void saveCookie(String key, String val) {
-		cookie = new Cookie();
+		Cookie cookie = new Cookie();
 		cookie[key] = val;
-		cookie[key]["expires"] = EXPIRES;
 		cookie[key]["path"] = "/";
-		//OUT << cookie.dump();
+		OUT << cookie.dump();
 	}
 	
 	void deleteCookie(String key) {
 		Cookie cookie = new Cookie();
-		cookie[key] = "";
-		cookie[key]["expires"] = PAST_DATE;
-		cookie[key]["path"] = "/";
+		cookie.delete(key);
 		OUT << cookie.dump();
 	}
 
@@ -64,10 +49,11 @@ class SEKENS
 	}
 
 	boolean checkReg(String userName) {
-		boolean recog = OK;
+		rSet = con.query("select * from user");
+		boolean recog = true;
 		while (rSet.next()) {
 			if (userName == rSet.getString("NAME")) {
-				recog = NG;
+				recog = false;
 				break;
 			}
 		}
@@ -75,10 +61,11 @@ class SEKENS
 	}
 	
 	boolean checkLog(String userName, String password) {
-		boolean recog = NG;
+		rSet = con.query("select * from user where name = '" + userName + "';");
+		boolean recog = false;
 		while (rSet.next()) {
-			if (userName == rSet.getString("NAME") && password == rSet.getString("PASSWORD")) {
-				recog = OK;
+			if (password == rSet.getString("PASSWORD")) {
+				recog = true;
 				break;
 			}
 		}
@@ -88,19 +75,18 @@ class SEKENS
 	void saveSID(String userName, String sid) {
 		String dbq = "update user set sid = '";
 		dbq += sid + "' where name = '" + userName + "';";
-		print dbq;
-		con.exec(dbq);
 		//OUT << dbq << EOL;
+		con.exec(dbq);
 	}
 	
 	void deleteSID(String userName) {
-		String dbq = "update user set sid = '";
-		dbq += "' where name = '" + userName + "';";
+		String dbq = "update user set sid = ''";
+		dbq += " where name = '" + userName + "';";
+		//OUT << dbq << EOL;
 		con.exec(dbq);
-		OUT << dbq << EOL;
 	}
-	
-	void checkSID () {
+
+	@Static void checkSID () {
 		Cookie cookie = new Cookie($env.HTTP_COOKIE);
 		if (cookie["SID"] == null) {
 			/*
@@ -131,6 +117,3 @@ class SEKENS
 		return script;
 	}
 }
-
-SEKENS sekens = new SEKENS();
-sekens.checkSID();

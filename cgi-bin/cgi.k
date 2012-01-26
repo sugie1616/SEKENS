@@ -24,7 +24,11 @@ class Cookie
 	}
 
 	void delete(String key) {
+		this[key] = "";
 		this[key]["expires"] = "Thu, 01 Jan 1970 00:00:00 GMT";
+		if (this[key]["path"] == null) {
+			this[key]["path"] = "/";
+		}
 	}
 
 	string dump(void) {
