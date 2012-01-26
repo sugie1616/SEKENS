@@ -5,9 +5,7 @@ Ext.require(['*']);
 Ext.onReady(function() {
 Ext.tip.QuickTipManager.init();
 
-var userName = 'sugimoto';
 var editFile = 'test.k';
-var homeURL = 'http://localhost/SEKENS/';
 
 var editorPanel = Ext.widget('form', {
 	title: 'Editor',
@@ -291,10 +289,11 @@ var centerPanel = Ext.create('Ext.panel.Panel', {
 				url: homeURL + 'cgi-bin/logout.k',
 				params: 'sugimoto',
 				success: function(result) {
-					Ext.Msg.alert('Logout Completed');
+					//Ext.Msg.alert('Logout Completed');
+					location.reload();
 				},
 				failure: function() {
-					Ext.Msg.alert('Logout Failed');
+					//Ext.Msg.alert('Logout Failed');
 				},
 			});
 		},

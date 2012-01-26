@@ -4,8 +4,6 @@ Ext.Loader.setPath('Ext.ux.DataView', '../../ext-4.0.7/example/ux/DataView');
 Ext.require(['*']);
 Ext.onReady(function() {
 
-	var homeURL = 'http://localhost/SEKENS/';
-
 	var formPanel = Ext.widget('form', {
 		renderTo: Ext.getBody(),
 		id: 'accountFormPanel',
@@ -15,7 +13,6 @@ Ext.onReady(function() {
 		bodyBorder: true,
 		title: 'Registration',
 		region: 'center',
-
 		defaults: {
 			anchor: '100%'
 		},
