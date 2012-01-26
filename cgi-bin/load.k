@@ -12,8 +12,9 @@
  */
 
 using konoha.conv.*;
-using konoha.json.*;
 using konoha.posix.*;
+
+include "SEKENS.k";
 
 DEBUG=false;
 

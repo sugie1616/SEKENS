@@ -3,7 +3,9 @@
 using konoha.conv.*;
 using konoha.io.*;
 
+include "SEKENS.k";
 OUT << "Content-Type: text/plain" << EOL << EOL;
+
 
 class Run
 {
@@ -39,7 +41,7 @@ class Run
 			OutputStream out = new OutputStream("./uSrcs/sugimoto/newTest.k");
 			out.print(newCode);
 			out.flush();
-			//OUT << exec("/usr/local/bin/konohac --emit-js" + " " + "./uSrcs/sugimoto/newTest.k") << EOL;
+			OUT << exec("/usr/local/bin/konohac --emit-js" + " " + "./uSrcs/sugimoto/newTest.k") << EOL;
 		}
 	}
 

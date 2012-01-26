@@ -2,17 +2,15 @@
 
 using konoha.uuid.*;
 using konoha.sql.*;
-include "SEKENS.k";
 
 OUT << "Content-Type: text/plain" << EOL << EOL;
 
 class Register
 {
-
 	String qStr;
 	String uName;
 	String password;
-	String usr_file = "../resources/users/users.sqlite3";
+	String usr_file = "/var/www/html/SEKENS/resources/users/users.sqlite3";
 	Connection con;
 	ResultSet rSet;
 
@@ -25,7 +23,7 @@ class Register
 		_rSet = con.query("select * from user");
 	}
 
-	boolean regCheck() {
+	boolean regCheck(ResultSet rSet) {
 		boolean doubly = false;
 		while (rSet.next()) {
 			if (uName == rSet.getString("NAME")) {
@@ -36,13 +34,14 @@ class Register
 		return doubly;
 	}
 
-	void registerUser(boolean doubly) {
+	void registerUser(String uName, String password,boolean doubly) {
 		if (doubly == true) {
 			OUT << "Register failed" << EOL;
 		}
 		else {
 			String dbq = "insert into user values('";
-			dbq += uName + "' , '" + password + "');";
+			dbq += uName + "' , '" + password + "' , '');";
+			OUT << dbq << EOL;
 			con.exec(dbq);
 			OUT << "Register completed" << EOL;
 		}
@@ -51,7 +50,7 @@ class Register
 
 void main() {
 	Register reg = new Register();
-	reg.registerUser(reg.regCheck());
+	reg.registerUser(reg.uName, reg.password, reg.regCheck(reg.rSet));
 	reg.rSet.close();
 	reg.con.close();
 }

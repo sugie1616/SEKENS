@@ -84,7 +84,7 @@ Ext.onReady(function() {
 			id: 'password1',
 			inputType: 'password',
 			allowBlank: false,
-			minLength: 8
+			minLength: 4,
 		},
 		{
 			xtype: 'displayfield',
@@ -182,11 +182,12 @@ Ext.onReady(function() {
 				width: 80,
 				handler: function() {
 					var debugEl = Ext.get("debug");
-					var form = formPanel.getForm();
+					var param = "username=" + formPanel.getForm().getValues().username + "&password1=" + formPanel.getForm().getValues().password1;
 					Ext.Ajax.request({
 						method: 'GET',
 						url: homeURL + 'cgi-bin/register.k',
-						params: form.getValues(true),
+						
+						params: param,
 						success: function(result) {
 							debugEl.dom.innerHTML = result.responseText;
 						},
@@ -203,14 +204,13 @@ Ext.onReady(function() {
 				width: 80,
 				handler: function() {
 					var debugEl = Ext.get("debug");
-					var form = formPanel.getForm();
+					var param = "username=" + formPanel.getForm().getValues().username + "&password1=" + formPanel.getForm().getValues().password1;
 					Ext.Ajax.request({
 						method: 'GET',
 						url: homeURL + 'cgi-bin/login.k',
-						params: form.getValues(true),
+						params: param,
 						success: function(result) {
-							form.findField('debug').setValue(result.responseText);
-							userName = 'sugimoto';
+							debugEl.dom.innerHTML = result.responseText;
 						},
 						failure: function() {
 						},

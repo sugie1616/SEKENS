@@ -1,7 +1,8 @@
 #!/usr/local/bin/konoha
 
-using konoha.libgit2.*;
 using konoha.conv.*;
+
+include "SEKENS.k";
 
 OUT << "Content-Type: text/plain" << EOL << EOL;
 String str,script,userName;
