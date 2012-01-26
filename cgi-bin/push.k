@@ -69,11 +69,11 @@ void main(String[] args)
 		return;
 	}
 
-	String user_dir = G_USER_DIR + "chen_ji" + "/";
-	String script_path = user_dir + script_name;
+	String user_sources_dir = G_USER_DIR + "chen_ji" + "/sources/";
+	String script_path = user_sources_dir + script_name;
 	SEKENS.saveScript(script_path, script_body);
 
-	Git git = new Git(user_dir + repo_title + "/.git");
+	Git git = new Git(user_sources_dir + repo_title + "/.git");
 	String result = "";
 	if (pushScript(git, script_path)) {
 		result = "Push successed.";
