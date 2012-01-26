@@ -1,45 +1,29 @@
 #!/usr/local/bin/konoha
 
 /*
- * load script
+ * load.k - load script
  *
  * @protocol GET
- * @param sid
- * @param name
- * @return json['error']
- * @return json['result']
- * @return json['script']
+ * @param sid				sid
+ * @param title				title of repository
+ * @param name				name of script to load
+ * @return json['error']	error message
+ * @return json['result']	result message
+ * @return json['script']	loaded script
  */
 
-using konoha.conv.*;
+using konoha.json.*;
 using konoha.posix.*;
-
+include "settings.k";
+include "cgi.k";
 include "SEKENS.k";
 
 DEBUG=false;
 
-HOME_DIR="/Users/chen_ji/Devel/git/SEKENS.codes/";
-
-void printError(String errtxt) {
+String err2json(String errtxt) {
 	Json j = new Json();
 	j["error"] = errtxt;
-	OUT << j.stringify() << EOL;
-}
-
-String loadScript(Path script_path)
-{
-	if (DEBUG) {
-		OUT << "load " + script_path << EOL;
-	}
-	InputStream ins = new InputStream(script_path);
-	String script = "";
-	foreach (String line in ins) {
-		script += line + EOL;
-	}
-	if (script == "") {
-		printError("No such script.");
-	}
-	return script;
+	return j.stringify();
 }
 
 void main(String[] args)
@@ -50,25 +34,30 @@ void main(String[] args)
 		OUT << "Content-Type: application/json;charset=UTF-8\n" << EOL;
 	}
 
-	String input = ($env.QUERY_STRING).convert(to:durl);
+	Cgi cgi = new Cgi();
 
-	Map<String> params = {};
-	foreach (String param in input.split("&")) {
-		String[] k_v = param.split("=");
-		params[k_v[0]] = k_v[1];
-	}
-
-	String script_name = params["name"];
+	String script_name = cgi.params["name"];
 	if (script_name == null) {
-		printError("Parameter 'name' is not given.");
+		OUT << err2json("Parameter 'name' is not given.") << EOL;
 		return;
 	}
 
-	String script = loadScript(HOME_DIR + script_name);
-	if (script != "") {
-		Json j = new Json();
-		j["result"] = "Load Successed.";
-		j["script"] = script;
-		OUT << j.stringify() << EOL;
+	String repo_title = cgi.params["title"];
+	if (repo_title == null) {
+		OUT << err2json("Parameter 'title' is not given.") << EOL;
+		return;
 	}
+
+	String user_dir = G_USER_DIR + "chen_ji" + "/";
+	String script_path = user_dir + script_name;
+	String script = SEKENS.loadScript(script_path);
+	if (script == "") {
+		OUT << err2json("No such script.") << EOL;
+		return;
+	}
+
+	Json j = new Json();
+	j["result"] = "Load Successed.";
+	j["script"] = script;
+	OUT << j.stringify() << EOL;
 }

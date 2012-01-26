@@ -84,6 +84,24 @@ class SEKENS
 		}
 		print "SID checked";
 	}
+
+	/* added by Wakamori */
+	@Static void saveScript(Path path, String body) {
+		OutputStream ous = new OutputStream(path);
+		ous << body;
+		ous.flush();
+		ous.close();
+	}
+
+	/* added by Wakamori */
+	@Static String loadScript(Path path) {
+		InputStream ins = new InputStream(path);
+		String script = "";
+		foreach (String line in ins) {
+			script += line + "\n";
+		}
+		return script;
+	}
 }
 
 SEKENS sekens = new SEKENS();
