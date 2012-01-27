@@ -4,10 +4,12 @@ using konoha.uuid.*;
 using konoha.cookie.*;
 using konoha.sql.*;
 using konoha.json.*;
+include "settings.k";
 
+OK = true;
+NG = false;
 USER_NAME = "";
 USER_SID = "";
-USER_FILE = "/var/www/html/SEKENS/resources/users/users.sqlite3";
 USER_GIT_REPO_DIR = "";
 CURRENT_DIR = "";
 EDIT_FILE_NAME = "";
@@ -33,7 +35,12 @@ HTML = """
 
 class SEKENS
 {
+	Connection con;
+	ResultSet rSet;
+
 	SEKENS() {
+		_con = new Connection(G_USER_DB);
+		_rSet = con.query("select * from user");
 	}
 
 	void saveCookie(String key, String val) {
@@ -41,7 +48,7 @@ class SEKENS
 		cookie[key] = val;
 		cookie[key]["expires"] = EXPIRES;
 		cookie[key]["path"] = "/";
-		OUT << cookie.dump();
+		//OUT << cookie.dump();
 	}
 	
 	void deleteCookie(String key) {
@@ -55,17 +62,38 @@ class SEKENS
 	String generateSid() {
 		return Uuid.getUuid4();
 	}
+
+	boolean checkReg(String userName) {
+		boolean recog = OK;
+		while (rSet.next()) {
+			if (userName == rSet.getString("NAME")) {
+				recog = NG;
+				break;
+			}
+		}
+		return recog;
+	}
+	
+	boolean checkLog(String userName, String password) {
+		boolean recog = NG;
+		while (rSet.next()) {
+			if (userName == rSet.getString("NAME") && password == rSet.getString("PASSWORD")) {
+				recog = OK;
+				break;
+			}
+		}
+		return recog;
+	}
 	
 	void saveSID(String userName, String sid) {
-		Connection con = new Connection(USER_FILE);
 		String dbq = "update user set sid = '";
 		dbq += sid + "' where name = '" + userName + "';";
+		print dbq;
 		con.exec(dbq);
-		OUT << dbq << EOL;
+		//OUT << dbq << EOL;
 	}
 	
 	void deleteSID(String userName) {
-		Connection con = new Connection(USER_FILE);
 		String dbq = "update user set sid = '";
 		dbq += "' where name = '" + userName + "';";
 		con.exec(dbq);
@@ -82,7 +110,7 @@ class SEKENS
 		}
 		else {
 		}
-		print "SID checked";
+		//print "SID checked";
 	}
 
 	/* added by Wakamori */

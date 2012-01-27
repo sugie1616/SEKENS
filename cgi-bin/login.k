@@ -1,43 +1,27 @@
 #!/usr/local/bin/konoha
 
 OUT << "Content-Type: text/plain" << EOL << EOL;
+include "settings.k";
 include "SEKENS.k";
 
 class LoginManager
 {
 	String qStr;
-	String uName;
+	String userName;
 	String password;
-	ResultSet rSet;
-	Connection con;
 
 	LoginManager() {
 		_qStr = $env.QUERY_STRING;
 		String[] map = qStr.split("&");
-		_uName = map[1].replace("username=", "");
+		_userName = map[1].replace("username=", "");
 		_password = map[2].replace("password1=", "");
-		_con = new Connection(USER_FILE);
-		_rSet = con.query("select * from user");
-	}
-
-	boolean loginCheck() {
-		boolean doubly = false;
-		while (rSet.next()) {
-			if (uName == rSet.getString("NAME") && password == rSet.getString("PASSWORD")) {
-				doubly = true;
-				break;
-			}
-		}
-		return doubly;
 	}
 	
-	void login(String userName) {
-		if (loginCheck() == true) {
-			//OUT << "OK" << EOL;
-			SEKENS sekens = new SEKENS();
-			String sid = sekens.generateSid();
-			sekens.saveSID(userName, sid);
-			sekens.saveCookie("SID", sid);
+	void login(SEKENS sks) {
+		if (sks.checkLog(userName, password) == OK) {
+			String sid = sks.generateSid();
+			sks.saveSID(userName, sid);
+			sks.saveCookie("SID", sid);
 			
 			OUT << "Content-Type: text/html\n" << EOL << EOL;
 			
@@ -55,8 +39,9 @@ class LoginManager
 }
 
 void main() {
+	SEKENS sks = new SEKENS();
 	LoginManager loginMan = new LoginManager();
-	loginMan.login(loginMan.uName);
-	loginMan.rSet.close();
-	loginMan.con.close();
+	loginMan.login(sks);
+	sks.rSet.close();
+	sks.con.close();
 }
