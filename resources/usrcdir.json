@@ -1,39 +1,24 @@
-{"text":".","children": [
+[
 	{
-		repoName:'Sugimoto',
-		userName:'Sugimoto',
-		iconCls:'task-folder',
-		expanded: true,
+		name:'Sugimoto',
 		children:[
 			{
-				userName: 'Sugimoto',
-				fileName: 'fibonacci.k',
-				repoName: 'fibonacci.k',
-				leaf: true,
-				iconCls: 'task',
+				name: 'fibonacci.k',
+				leaf: true
 			},
 			{
-				userName:'Sugimoto',
-				fileName:'quicksort.k',
-				repoName:'quicksort.k',
-				leaf: true,
-				iconCls:'task',
+				name:'quicksort.k',
+				leaf: true
 			}
 		]
 	},
 	{
-		repoName:'Sugimoto2',
-		userName:'Sugimoto2',
-		iconCls:'task-folder',
-		expanded: true,
+		name:'Sugimoto2',
 		children:[
 			{
-				userName: 'Sugimoto2',
-				fileName: 'fibonacci.k',
-				repoName: 'fibonacci.k',
-				leaf: true,
-				iconCls: 'task',
+				name: 'fibonacci.k',
+				leaf: true
 			}
 		]
 	}
-]}
+]

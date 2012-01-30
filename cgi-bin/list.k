@@ -5,10 +5,7 @@
  *
  * @protocol GET
  * @param cookie['SID']		sid
- * @param user				username of target repository owner
- * @return json['result']	result message
- * @return json['error']	error message
- * @return json['list']		list of git repositories
+ * @return array[map]		directory tree
  */
 
 include "SEKENS.k";
@@ -32,25 +29,44 @@ void main(String[] args)
 
 	Cgi cgi = new Cgi();
 
-	String username = cgi.params["user"];
-	if (username == null) {
-		OUT << err2json("Parameter 'user' is not given.") << EOL;
-		return;
-	}
-
 	String sid = cgi.cookies["SID"]["val"];
-	if (SEKENS.existsSID(sid) == false) {
+	Json j = SEKENS.checkSID(sid);
+	if (j == null) {
 		OUT << err2json("sid is incorrect") << EOL;
 		return;
 	}
 
+	String username = j["username"];
 	String user_dir = G_USER_DIR + username + "/";
 
 	String[] git_repos = exec("ls " + user_dir).split("\n");
 	git_repos.pop();
 
-	Json j = new Json();
-	j["result"] = "get list successed";
-	j["list"] = git_repos;
-	OUT << j.stringify() << EOL;
+	Map[] tree = [];
+	foreach (String repo in git_repos) {
+		Map m = {};
+		m["name"] = repo;
+		String repo_dir = user_dir + repo + "/";
+		String[] files = exec("ls " + repo_dir).split("\n");
+		files.pop();
+		m["children"] = files;
+		tree.add(m);
+	}
+
+	OUT.println("[");
+	foreach (Map node in tree) {
+		OUT.println("	{");
+		OUT.println("		\"name\": \"" + node["name"] + "\",");
+		OUT.println("		\"children\": [");
+		String[] children = node["children"];
+		foreach (String e in children) {
+			OUT.println("			{");
+			OUT.println("				\"name\": \"" + e + "\",");
+			OUT.println("				\"leaf\": true");
+			OUT.println("			},");
+		}
+		OUT.println("		]");
+		OUT.println("	},");
+	}
+	OUT.println("]");
 }

@@ -116,9 +116,9 @@ Ext.onReady(function() {
 	Ext.define('uSrcDirModel', {
 		extend: 'Ext.data.Model',
 		fields: [
-			{name: 'userName', type: 'string'},
-			{name: 'repoName', type: 'string'},
-			{name: 'fileName', type: 'string'}
+			//{name: 'userName', type: 'string'},
+			//{name: 'repoName', type: 'string'},
+			{name: 'name', type: 'string'}
 		]
 	});
 
@@ -126,7 +126,7 @@ Ext.onReady(function() {
 		model: 'uSrcDirModel',
 		proxy: {
 			type: 'ajax',
-			url: homeURL + 'resources/usrcdir.json'
+			url: homeURL + 'cgi-bin/list.k'
 		},
 		folderSort: true
 	});
@@ -151,7 +151,7 @@ Ext.onReady(function() {
 				text: 'File',
 				flex: 1.5,
 				sortable: true,
-				dataIndex: 'repoName'
+				dataIndex: 'name'
 			},
 			//		{
 			//			text: 'Name',
