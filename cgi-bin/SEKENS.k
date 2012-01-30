@@ -21,6 +21,7 @@ class SEKENS
 			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/examples/ux/DataView/DragSelector.css" />
 			<script type="text/javascript" src="../ext-4.0.7/bootstrap.js"></script>
 			<script type="text/javascript" src="../jssrc/data.js"></script>
+			%username%
 			<script type="text/javascript" src="../jssrc/%script%"></script>
 			<style type="text/css">
 				.task {

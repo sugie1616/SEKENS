@@ -13,15 +13,16 @@ void main()
 		if (j != null) {
 			String username = j["username"];
 			/* [TODO] how to user username? */
-			html = html.replace("%script%", "main.js");
+			html = html.replace("%script%", "main.js").replace("%username%",
+					"<script type=\"text/javascript\">\n<!--\nvar userName = '" + username + "';\n// -->\n</script>");
 		}
 		else {
 			OUT << sekens.deleteCookie("SID");
-			html = html.replace("%script%", "top.js");
+			html = html.replace("%script%", "top.js").replace("%username%", "");
 		}
 	}
 	else {
-		html = html.replace("%script%", "top.js");
+		html = html.replace("%script%", "top.js").replace("%username%", "");
 	}
 
 	OUT << "Content-Type: text/html\n" << EOL;
