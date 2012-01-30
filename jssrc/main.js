@@ -285,11 +285,11 @@ var centerPanel = Ext.create('Ext.panel.Panel', {
 		text: 'Logout',
 		handler: function() {
 			Ext.Ajax.request({
-				method: 'GET',
+				method: 'POST',
 				url: homeURL + 'cgi-bin/logout.k',
-				params: 'sugimoto',
 				success: function(result) {
 					//Ext.Msg.alert('Logout Completed');
+					Ext.util.Cookies.clear("SID", "/");
 					location.reload();
 				},
 				failure: function() {

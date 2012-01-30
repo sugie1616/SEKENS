@@ -33,17 +33,17 @@ class SEKENS
 		_con = new Connection(G_USER_DB);
 	}
 
-	@Static void saveCookie(String key, String val) {
+	@Static String saveCookie(String key, String val) {
 		Cookie cookie = new Cookie();
 		cookie[key] = val;
 		cookie[key]["path"] = "/";
-		OUT << cookie.dump();
+		return cookie.dump();
 	}
 	
-	@Static void deleteCookie(String key) {
+	@Static String deleteCookie(String key) {
 		Cookie cookie = new Cookie();
 		cookie.delete(key);
-		OUT << cookie.dump();
+		return cookie.dump();
 	}
 
 	@Static String generateSid() {
@@ -122,5 +122,37 @@ class SEKENS
 			script += line + "\n";
 		}
 		return script;
+	}
+}
+
+class LoginManager
+{
+	String userName;
+	String password;
+	String sid;
+
+	LoginManager() {
+		Cgi cgi = new Cgi();
+		_userName = cgi.params["username"];
+		_password = cgi.params["password"];
+		if (cgi.cookies["SID"] != null) {
+			_sid = cgi.cookies["SID"]["val"];
+		}
+	}
+
+	String login(SEKENS sks) {
+		if (sks.checkLog(userName, password) == true) {
+			String sid = sks.generateSid();
+			sks.saveSID(userName, sid);
+			return sid;
+		}
+		return null;
+	}
+
+	boolean logout(SEKENS sks) {
+		if (sid == null) return true;
+		Json j = sks.checkSID(sid);
+		userName = j["username"];
+		return sks.deleteSID(userName);
 	}
 }

@@ -184,7 +184,7 @@ Ext.onReady(function() {
 					var debugEl = Ext.get("debug");
 					var param = "username=" + formPanel.getForm().getValues().username + "&password1=" + formPanel.getForm().getValues().password1;
 					Ext.Ajax.request({
-						method: 'GET',
+						method: 'POST',
 						url: homeURL + 'cgi-bin/register.k',
 						
 						params: param,
@@ -206,11 +206,18 @@ Ext.onReady(function() {
 					var debugEl = Ext.get("debug");
 					var param = "username=" + formPanel.getForm().getValues().username + "&password1=" + formPanel.getForm().getValues().password1;
 					Ext.Ajax.request({
-						method: 'GET',
+						method: 'POST',
 						url: homeURL + 'cgi-bin/login.k',
 						params: param,
 						success: function(result) {
-							debugEl.dom.innerHTML = result.responseText;
+							var resultJson = Ext.JSON.decode(result.responseText);
+							Ext.util.Cookies.set(
+								"SID", // name
+								resultJson["SID"], // value
+								new Date(new Date().getTime() + (1000 * 60 * 60 * 4)), // expires (4 hours)
+								"/" // path
+							);
+							location.reload();
 						},
 						failure: function() {
 						},

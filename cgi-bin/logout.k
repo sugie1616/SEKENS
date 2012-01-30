@@ -1,12 +1,10 @@
 #!/usr/local/bin/konoha
 
 /*
- * login.k - login and return SID
+ * logout.k - logout and remove SID on server
  *
  * @protocol POST
- * @param username			username
- * @param password			password
- * @return json['SID']		session ID
+ * @param cookie['SID']		sid
  * @return json['result']	result message
  * @return json['error']	error message
  */
@@ -17,13 +15,11 @@ void main() {
 	OUT << "Content-Type: application/json;charset=UTF-8\n" << EOL;
 	SEKENS sks = new SEKENS();
 	LoginManager loginMan = new LoginManager();
-	String s = loginMan.login(sks);
 	Json j = new Json();
-	if (s == null) {
-		j["error"] = "Failed to login";
+	if (loginMan.logout(sks)) {
+		j["result"] = "Logout successed";
 	} else {
-		j["SID"] = s;
-		j["result"] = "Login successed";
+		j["error"] = "Failed to logout";
 	}
 	OUT << j.stringify() << EOL;
 }
