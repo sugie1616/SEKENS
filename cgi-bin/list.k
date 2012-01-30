@@ -4,16 +4,13 @@
  * list.k - list all of user repositories
  *
  * @protocol GET
- * @param user				username
+ * @param cookie['SID']		sid
+ * @param user				username of target repository owner
  * @return json['result']	result message
  * @return json['error']	error message
  * @return json['list']		list of git repositories
  */
 
-using konoha.json.*;
-using konoha.posix.*;
-include "settings.k";
-include "cgi.k";
 include "SEKENS.k";
 
 DEBUG=false;
@@ -38,6 +35,12 @@ void main(String[] args)
 	String username = cgi.params["user"];
 	if (username == null) {
 		OUT << err2json("Parameter 'user' is not given.") << EOL;
+		return;
+	}
+
+	String sid = cgi.cookies["SID"]["val"];
+	if (SEKENS.existsSID(sid) == false) {
+		OUT << err2json("sid is incorrect") << EOL;
 		return;
 	}
 

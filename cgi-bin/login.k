@@ -1,8 +1,16 @@
 #!/usr/local/bin/konoha
 
-using konoha.json.*;
+/*
+ * login.k - login and return SID
+ *
+ * @protocol POST
+ * @param username			username
+ * @param password			password
+ * @return json['SID']		session ID
+ * @return json['result']	result message
+ * @return json['error']	error message
+ */
 
-OUT << "Content-Type: text/plain" << EOL << EOL;
 include "SEKENS.k";
 
 class LoginManager
@@ -16,28 +24,28 @@ class LoginManager
 		_password = cgi.params["password"];
 	}
 
-	void login(SEKENS sks) {
+	String login(SEKENS sks) {
 		if (sks.checkLog(userName, password) == true) {
 			String sid = sks.generateSid();
 			sks.saveSID(userName, sid);
 			sks.saveCookie("SID", sid);
-
-			OUT << "Content-Type: text/html\n" << EOL << EOL;
-
-			Json j = new Json();
-			j["SID"] = sid;
-			OUT << j.stringify() << EOL;
-
-			print $env.HTTP_COOKIE;
+			return sid;
 		}
-		else {
-			OUT << "PLEASE RETAKE" << EOL;
-		}
+		return null;
 	}
 }
 
 void main() {
+	OUT << "Content-Type: application/json;charset=UTF-8\n" << EOL;
 	SEKENS sks = new SEKENS();
 	LoginManager loginMan = new LoginManager();
-	loginMan.login(sks);
+	String s = loginMan.login(sks);
+	Json j = new Json();
+	if (s == null) {
+		j["error"] = "Failed to login";
+	} else {
+		j["SID"] = s;
+		j["result"] = "Login successed";
+	}
+	OUT << j.stringify() << EOL;
 }

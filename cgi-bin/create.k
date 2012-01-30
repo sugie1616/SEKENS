@@ -4,7 +4,7 @@
  * create.k - create a new git repository
  *
  * @protocol POST
- * @param sid				sid
+ * @param cookie['SID']		sid
  * @param title				title of new repository
  * @param desc				description of new repository
  * @return json['result']	result message
@@ -13,8 +13,7 @@
 
 using konoha.json.*;
 using konoha.posix.*;
-include "settings.k";
-include "cgi.k";
+include "SEKENS.k";
 include "git.k";
 
 DEBUG=false;
@@ -48,7 +47,20 @@ void main(String[] args)
 		return;
 	}
 
-	String user_dir = G_USER_DIR + "chen_ji" + "/";
+	String sid = cgi.cookies["SID"]["val"];
+	if (sid == null) {
+		OUT << err2json("sid is not found") << EOL;
+		return;
+	}
+
+	Json j = SEKENS.checkSID(sid);
+	String username = j["username"];
+	if (username == null) {
+		OUT << err2json("username is not found") << EOL;
+		return;
+	}
+
+	String user_dir = G_USER_DIR + username + "/";
 
 	String create_dir = user_dir + repo_title + "/";
 	if (mkdir(create_dir, 0775) == false) {
@@ -65,7 +77,7 @@ void main(String[] args)
 	Git git = new Git(create_gitdir);
 	git.init();
 
-	Json j = new Json();
+	j = new Json();
 	j["result"] = "create repository successed";
 	OUT << j.stringify() << EOL;
 }

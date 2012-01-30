@@ -4,7 +4,7 @@
  * load.k - load script
  *
  * @protocol GET
- * @param sid				sid
+ * @param cookie['SID']		sid
  * @param title				title of repository
  * @param name				name of script to load
  * @return json['error']	error message
@@ -12,10 +12,6 @@
  * @return json['script']	loaded script
  */
 
-using konoha.json.*;
-using konoha.posix.*;
-include "settings.k";
-include "cgi.k";
 include "SEKENS.k";
 
 DEBUG=false;
@@ -48,7 +44,11 @@ void main(String[] args)
 		return;
 	}
 
-	String user_dir = G_USER_DIR + "chen_ji" + "/";
+	String sid = cgi.cookies["SID"]["val"];
+	Json j = SEKENS.checkSID(sid);
+	String user_name = j["username"];
+
+	String user_dir = G_USER_DIR + user_name + "/";
 	String script_path = user_dir + script_name;
 	String script = SEKENS.loadScript(script_path);
 	if (script == "") {

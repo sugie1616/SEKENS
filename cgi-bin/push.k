@@ -4,7 +4,7 @@
  * push.k - push & commit script
  *
  * @protocol POST
- * @param sid				sid
+ * @param cookie['SID']		sid
  * @param title				title of repository
  * @param name				name of script to commit
  * @param script			script body
@@ -12,12 +12,8 @@
  * @return json['error']	error message
  */
 
-using konoha.json.*;
-using konoha.posix.*;
-include "settings.k";
-include "cgi.k";
-include "git.k";
 include "SEKENS.k";
+include "git.k";
 
 DEBUG=false;
 
@@ -58,18 +54,28 @@ void main(String[] args)
 		OUT << err2json("Parameter 'name' is not given.") << EOL;
 		return;
 	}
+
 	String script_body = cgi.params["script"];
 	if (script_body == null) {
 		OUT << err2json("Parameter 'script' is not given.") << EOL;
 		return;
 	}
+
 	String repo_title = cgi.params["title"];
 	if (repo_title == null) {
 		OUT << err2json("Parameter 'title' is not given.") << EOL;
 		return;
 	}
 
-	String user_sources_dir = G_USER_DIR + "chen_ji" + "/sources/";
+	String sid = cgi.cookies["SID"]["val"];
+	Json j = SEKENS.checkSID(sid);
+	if (j == null) {
+		OUT << err2json("SID is not exist") << EOL;
+		return;
+	}
+	String username = j["username"];
+
+	String user_sources_dir = G_USER_DIR + username + "/sources/";
 	String script_path = user_sources_dir + script_name;
 	SEKENS.saveScript(script_path, script_body);
 

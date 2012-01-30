@@ -6,13 +6,23 @@ void main()
 {
 	SEKENS sekens = new SEKENS();
 	String html = sekens.html;
-	Cookie cookie = new Cookie($env.HTTP_COOKIE);
-	if (cookie["SID"] != null) {
+	Cgi cgi = new Cgi();
+	if (cgi.cookies["SID"] != null) {
+		String sid = cgi.cookies["SID"]["val"];
+		Json j = sekens.checkSID(sid);
+		if (j != null) {
+			String username = j["username"];
+			/* [TODO] how to user username? */
+			html = html.replace("%script%", "top.js");
+		}
+		else {
+			html = html.replace("%script%", "main.js");
+		}
 	}
 	else {
-		//html = html.replace("top.js", "main.js");
+		html = html.replace("%script%", "main.js");
 	}
-	
+
 	OUT << "Content-Type: text/html\n" << EOL;
 	OUT << html;
 	OUT.flush();

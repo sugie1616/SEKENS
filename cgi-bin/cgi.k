@@ -64,8 +64,11 @@ class Cgi
 		return m;
 	}
 
-	Cgi() {
+	Cgi(String request_method) {
 		_method = $env.REQUEST_METHOD;
+		if (request_method != null && request_method != method) {
+			throw new Script!!("request method is not match");
+		}
 		String query = "";
 		if (method == "POST") {
 			query = System.readLine();
