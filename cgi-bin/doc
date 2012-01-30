@@ -13,10 +13,11 @@ void main()
 		if (j != null) {
 			String username = j["username"];
 			/* [TODO] how to user username? */
-			html = html.replace("%script%", "top.js");
+			html = html.replace("%script%", "main.js");
 		}
 		else {
-			html = html.replace("%script%", "main.js");
+			OUT << sekens.deleteCookie("SID");
+			html = html.replace("%script%", "top.js");
 		}
 	}
 	else {

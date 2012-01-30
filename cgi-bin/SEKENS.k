@@ -22,6 +22,14 @@ class SEKENS
 			<script type="text/javascript" src="../ext-4.0.7/bootstrap.js"></script>
 			<script type="text/javascript" src="../jssrc/data.js"></script>
 			<script type="text/javascript" src="../jssrc/%script%"></script>
+			<style type="text/css">
+				.task {
+					background-image: url(http://localhost/SEKENS/ext-4.0.7/examples/shared/icons/fam/cog.gif) !important;
+				}
+				.task-folder {
+					background-image: url(http://localhost/SEKENS/ext-4.0.7/examples/shared/icons/fam/folder_go.gif) !important;
+				}
+			</style>
 		</head>
 		<body>
 		</body>
@@ -74,8 +82,8 @@ class SEKENS
 		OutputStream tmpsid = new OutputStream(G_TMP_DIR + sid);
 		Json j = new Json();
 		j["username"] = userName;
-		tmpsid << j.stringify();
-		tmpsid.flush();
+		tmpsid.println(j.stringify());
+		tmpsid.close();
 		return true;
 	}
 	
