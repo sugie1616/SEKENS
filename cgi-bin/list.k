@@ -12,13 +12,6 @@ include "SEKENS.k";
 
 DEBUG=false;
 
-String err2json(String errtxt)
-{
-	Json j = new Json();
-	j["error"] = errtxt;
-	return j.stringify();
-}
-
 void main(String[] args)
 {
 	if (DEBUG) {
@@ -32,7 +25,7 @@ void main(String[] args)
 	String sid = cgi.cookies["SID"]["val"];
 	Json j = SEKENS.checkSID(sid);
 	if (j == null) {
-		OUT << err2json("sid is incorrect") << EOL;
+		OUT << SEKENS.err2json("sid is incorrect") << EOL;
 		return;
 	}
 

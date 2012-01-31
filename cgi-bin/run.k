@@ -1,53 +1,66 @@
 #!/usr/local/bin/konoha
 
-using konoha.conv.*;
-using konoha.io.*;
+/*
+ * run.k - run script
+ *
+ * @protocol POST
+ * @param cookie['SID']		sid
+ * @param title				title of repository
+ * @param name				script name
+ * @return json['result']	result message
+ * @return json['error']	error message
+ */
 
 include "SEKENS.k";
-OUT << "Content-Type: text/plain" << EOL << EOL;
-
 
 class Run
 {
-	String srcDir = "../resources/uSrcs/sugimoto/test.k";
-	String newCode,oldCode;
+	String user;
+	String repo;
+	String script;
 
-	Run() {
-		_newCode = readLine().replace("input=", "");
-		_newCode = newCode.convert(to:durl);
-		InputStream ins = new InputStream(srcDir);
-		foreach (String str in ins) {
-			_oldCode += str + "\n";
-		}
-		print oldCode;
-		print newCode;
+	Run(String username, String reponame, String scriptname) {
+		_user = username;
+		_repo = reponame;
+		_script = scriptname;
 	}
 	
-	boolean checkUpdateSrc() {
-		boolean updateSrc = false;//true = updated
-		if (newCode == oldCode) {
-			print "code is NOT changed";
-			//OUT << exec("/usr/local/bin/konohac --emit-js" + " " + srcDir) << EOL;
-		}
-		else {
-			print "code is changed";
-			updateSrc = true;
-		}
-		return updateSrc;
+	String evalKonoha() {
+		String script_path = G_USER_DIR + user + "/" + repo + "/" + script;
+		String resultcode = exec("/usr/local/bin/konohac --emit-js " + script_path);
+		return resultcode;
 	}
-	
-	void evalKonoha(boolean updateSrc) {
-		if (updateSrc == true) {
-			OutputStream out = new OutputStream("./uSrcs/sugimoto/newTest.k");
-			out.print(newCode);
-			out.flush();
-			OUT << exec("/usr/local/bin/konohac --emit-js" + " " + "./uSrcs/sugimoto/newTest.k") << EOL;
-		}
-	}
-
 }
 
 void main() {
-	Run run = new Run();
-	run.evalKonoha(run.checkUpdateSrc());
+	OUT.println("Content-Type: text/javascript\n");
+	Cgi cgi = new Cgi();
+
+	InputStream ins = new InputStream("../jssrc/konoha.js");
+	foreach (String line in ins) {
+		OUT.println(line);
+	}
+
+	String script_name = cgi.params["name"];
+	if (script_name == null) {
+		OUT << SEKENS.err2json("Parameter 'name' is not given.") << EOL;
+		return;
+	}
+
+	String repo_title = cgi.params["title"];
+	if (repo_title == null) {
+		OUT << SEKENS.err2json("Parameter 'title' is not given.") << EOL;
+		return;
+	}
+
+	String sid = cgi.cookies["SID"]["val"];
+	Json j = SEKENS.checkSID(sid);
+	if (j == null) {
+		OUT << SEKENS.err2json("SID is not exist") << EOL;
+		return;
+	}
+	String username = j["username"];
+
+	Run run = new Run(username, repo_title, script_name);
+	OUT << run.evalKonoha() << EOL;
 }

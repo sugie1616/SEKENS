@@ -11,19 +11,10 @@
  * @return json['error']	error message
  */
 
-using konoha.json.*;
-using konoha.posix.*;
 include "SEKENS.k";
 include "git.k";
 
 DEBUG=false;
-
-String err2json(String errtxt)
-{
-	Json j = new Json();
-	j["error"] = errtxt;
-	return j.stringify();
-}
 
 void main(String[] args)
 {
@@ -37,26 +28,26 @@ void main(String[] args)
 
 	String repo_title = cgi.params["title"];
 	if (repo_title == null) {
-		OUT << err2json("Parameter 'title' is not given.") << EOL;
+		OUT << SEKENS.err2json("Parameter 'title' is not given.") << EOL;
 		return;
 	}
 
 	String repo_desc = cgi.params["desc"];
 	if (repo_desc == null) {
-		OUT << err2json("Parameter 'desc' is not given.") << EOL;
+		OUT << SEKENS.err2json("Parameter 'desc' is not given.") << EOL;
 		return;
 	}
 
 	String sid = cgi.cookies["SID"]["val"];
 	if (sid == null) {
-		OUT << err2json("sid is not found") << EOL;
+		OUT << SEKENS.err2json("sid is not found") << EOL;
 		return;
 	}
 
 	Json j = SEKENS.checkSID(sid);
 	String username = j["username"];
 	if (username == null) {
-		OUT << err2json("username is not found") << EOL;
+		OUT << SEKENS.err2json("username is not found") << EOL;
 		return;
 	}
 
@@ -64,13 +55,13 @@ void main(String[] args)
 
 	String create_dir = user_dir + repo_title + "/";
 	if (mkdir(create_dir, 0775) == false) {
-		OUT << err2json("mkdir '" + create_dir + "' failed") << EOL;
+		OUT << SEKENS.err2json("mkdir '" + create_dir + "' failed") << EOL;
 		return;
 	}
 
 	String create_gitdir = create_dir + ".git";
 	if (mkdir(create_gitdir, 0775) == false) {
-		OUT << err2json("mkdir '" + create_gitdir + "' failed") << EOL;
+		OUT << SEKENS.err2json("mkdir '" + create_gitdir + "' failed") << EOL;
 		return;
 	}
 

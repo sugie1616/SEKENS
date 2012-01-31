@@ -16,12 +16,6 @@ include "SEKENS.k";
 
 DEBUG=false;
 
-String err2json(String errtxt) {
-	Json j = new Json();
-	j["error"] = errtxt;
-	return j.stringify();
-}
-
 void main(String[] args)
 {
 	if (DEBUG) {
@@ -34,13 +28,13 @@ void main(String[] args)
 
 	String script_name = cgi.params["name"];
 	if (script_name == null) {
-		OUT << err2json("Parameter 'name' is not given.") << EOL;
+		OUT << SEKENS.err2json("Parameter 'name' is not given.") << EOL;
 		return;
 	}
 
 	String repo_title = cgi.params["title"];
 	if (repo_title == null) {
-		OUT << err2json("Parameter 'title' is not given.") << EOL;
+		OUT << SEKENS.err2json("Parameter 'title' is not given.") << EOL;
 		return;
 	}
 
@@ -52,7 +46,7 @@ void main(String[] args)
 	String script_path = user_dir + script_name;
 	String script = SEKENS.loadScript(script_path);
 	if (script == "") {
-		OUT << err2json("No such script.") << EOL;
+		OUT << SEKENS.err2json("No such script.") << EOL;
 		return;
 	}
 

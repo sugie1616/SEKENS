@@ -21,6 +21,11 @@ class SEKENS
 			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/examples/ux/DataView/DragSelector.css" />
 			<script type="text/javascript" src="../ext-4.0.7/bootstrap.js"></script>
 			<script type="text/javascript" src="../jssrc/data.js"></script>
+			<script type="text/javascript" src="../jssrc/konoha.js"></script>
+			<script type="text/javascript" src="../jssrc/js.js"></script>
+			<script type="text/javascript" src="../jssrc/js.dom.js"></script>
+			<script type="text/javascript" src="../jssrc/jquery-1.7.1.min.js"></script>
+			<script type="text/javascript" src="../jssrc/js.jquery.js"></script>
 			%username%
 			<script type="text/javascript" src="../jssrc/%script%"></script>
 			<style type="text/css">
@@ -131,6 +136,12 @@ class SEKENS
 			script += line + "\n";
 		}
 		return script;
+	}
+
+	@Static String err2json(String errtxt) {
+		Json j = new Json();
+		j["error"] = errtxt;
+		return j.stringify();
 	}
 }
 

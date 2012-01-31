@@ -40,19 +40,69 @@ Ext.onReady(function() {
 				name: 'runbtn',
 				text: 'Run',
 				handler: function() {
-					Ext.Ajax.request({
-						method: 'POST',
-					url: homeURL + 'cgi-bin/run.k',
-					params: {
-						input: editorPanel.getForm().getValues().textarea,
-					},
-					success: function(result) {
-						editorPanel.getForm().findField('console').setValue(result.responseText);
-					},
-					failure: function() {
-						Ext.Msg.alert('Fail Run Konoha');
-					},
+					var worker = new Worker(homeURL + 'cgi-bin/run.k?title=test&name=hello.k');
+					worker.onmessage = function(e) {
+						editorPanel.getForm().findField('console').setValue(e.data);
+						Ext.MessageBox.hide();
+					};
+					worker.onerror = function(e) {
+						Ext.MessageBox.hide();
+						Ext.MessageBoxlalert('Status', 'An error occurred!', function(btn) {/* do nothing */});
+					};
+					worker.postMessage("start");
+					var stopKonoha = function(btn) {
+						worker.terminate();
+					};
+					Ext.MessageBox.show({
+						msg: 'Running konoha, please wait...',
+						progressText: 'Running...',
+						width: 300,
+						wait: true,
+						waitConfig: {interval:200},
+						buttons: Ext.MessageBox.CANCEL,
+						fn: stopKonoha,
+						icon: './resources/images/konoha.png'
 					});
+					//Ext.Ajax.request({
+					//	method: 'GET',
+					//	url: homeURL + 'cgi-bin/run.k',
+					//	params: {
+					//		title: 'test',
+					//		name: 'hello.k'
+					//	},
+					//	success: function(result) {
+					//		var addScript = function(url) {
+					//			var el = document.createElement("script");
+					//			el.setAttribute("src", url);
+					//			el.setAttribute("charset", "UTF-8");
+					//			document.getElementByTagName("head").item(0).appendChild(el);
+					//		};
+					//		//var resultJson = Ext.JSON.decode(result.responseText);
+					//		eval(result);
+					//		Ext.MessageBox.show({
+					//			msg: 'Running konoha, please wait...',
+					//			progressText: 'Running...',
+					//			width: 300,
+					//			wait: true,
+					//			waitConfig: {interval:200},
+					//			buttons: Ext.MessageBox.CANCEL,
+					//			fn: stopKonoha,
+					//			icon: './resources/images/konoha.png'
+					//		});
+					//		konoha_main({
+					//			failure: function() {
+					//				editorPanel.getForm().findField('console').setValue('failed!');
+					//			},
+					//			success: function(result) {
+					//				editorPanel.getForm().findField('console').setValue(result);
+					//			}
+					//		});
+					//		Ext.MessageBox.hide();
+					//	},
+					//	failure: function() {
+					//		Ext.Msg.alert('Compile failed');
+					//	},
+					//});
 				},
 			},	
 			{
