@@ -60,7 +60,7 @@ Ext.onReady(function() {
 			emptyText: 'User Name',
 			//fieldLabel: 'User Name',
 			allowBlank: false,
-			minLength: 6
+			minLength: 4
 		},
 		//	{
 		//		xtype: 'displayfield',
@@ -181,18 +181,40 @@ Ext.onReady(function() {
 				text: 'Register!',
 				width: 80,
 				handler: function() {
-					var debugEl = Ext.get("debug");
-					var param = "username=" + formPanel.getForm().getValues().username + "&password=" + formPanel.getForm().getValues().password1;
 					Ext.Ajax.request({
 						method: 'POST',
 						url: homeURL + 'cgi-bin/register.k',
 						
-						params: param,
+						params: {
+							username: formPanel.getForm().getValues().username,
+							password: formPanel.getForm().getValues().password1
+						},
 						success: function(result) {
-//							debugEl.dom.innerHTML = result.responseText;
+							var json = Ext.JSON.decode(result.responseText);
+							if (json['error'] != null) {
+								Ext.MessageBox.show({
+									title: 'Error',
+									msg: json['error'],
+									icon: Ext.MessageBox.ERROR,
+									buttons: Ext.MessageBox.OK
+								});
+							} else {
+								Ext.MessageBox.show({
+									title: 'Result',
+									msg: json['result'],
+									icon: Ext.MessageBox.OK,
+									buttons: Ext.MessageBox.OK
+								});
+							}
 						},
 						failure: function() {
-						},
+							Ext.MessageBox.show({
+								title: 'Error',
+								msg: 'Register failed',
+								icon: Ext.MessageBox.ERROR,
+								buttons: Ext.MessageBox.OK
+							});
+						}
 					});
 				},
 			},
@@ -203,23 +225,39 @@ Ext.onReady(function() {
 				text: 'Login',
 				width: 80,
 				handler: function() {
-					var debugEl = Ext.get("debug");
-					var param = "username=" + formPanel.getForm().getValues().username + "&password=" + formPanel.getForm().getValues().password1;
 					Ext.Ajax.request({
 						method: 'POST',
 						url: homeURL + 'cgi-bin/login.k',
-						params: param,
+						params: {
+							username: formPanel.getForm().getValues().username,
+							password: formPanel.getForm().getValues().password1
+						},
 						success: function(result) {
-							var resultJson = Ext.JSON.decode(result.responseText);
-							Ext.util.Cookies.set(
-								"SID", // name
-								resultJson["SID"], // value
-								new Date(new Date().getTime() + (1000 * 60 * 60 * 4)), // expires (4 hours)
-								"/" // path
-							);
-							location.reload();
+							var json = Ext.JSON.decode(result.responseText);
+							if (json['error'] != null) {
+								Ext.MessageBox.show({
+									title: 'Error',
+									msg: json['error'],
+									icon: Ext.MessageBox.ERROR,
+									buttons: Ext.MessageBox.OK
+								});
+							} else {
+								Ext.util.Cookies.set(
+									"SID", // name
+									json["SID"], // value
+									new Date(new Date().getTime() + (1000 * 60 * 60 * 4)), // expires (4 hours)
+									"/" // path
+								);
+								location.reload();
+							}
 						},
 						failure: function() {
+							Ext.MessageBox.show({
+								title: 'Error',
+								msg: 'Login failed',
+								icon: Ext.MessageBox.ERROR,
+								buttons: Ext.MessageBox.OK
+							});
 						},
 					});
 				}
@@ -231,7 +269,7 @@ Ext.onReady(function() {
 	new Ext.Viewport({
 		layout: 'border',
 		items: [
-		formPanel,
+		formPanel
 		]
 	});
 

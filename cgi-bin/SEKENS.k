@@ -20,6 +20,9 @@ class SEKENS
 			<link rel="stylesheet" type="text/css" href="../resources/peers.css"/>
 			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/examples/ux/DataView/DragSelector.css" />
 			<script type="text/javascript" src="../ext-4.0.7/bootstrap.js"></script>
+			<script type="text/javascript" src="../ext-4.0.7/Ext.ux.panel.CodeMirror.js"></script>
+			<!-- Loading CodeMirror Template files -->
+			<script type="text/javascript" src="../ext-4.0.7/CodeMirror-2.0/lib/codemirror.js"></script>
 			<script type="text/javascript" src="../jssrc/data.js"></script>
 			<script type="text/javascript" src="../jssrc/konoha.js"></script>
 			<script type="text/javascript" src="../jssrc/js.js"></script>
@@ -28,6 +31,30 @@ class SEKENS
 			<script type="text/javascript" src="../jssrc/js.jquery.js"></script>
 			%username%
 			<script type="text/javascript" src="../jssrc/%script%"></script>
+			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/CodeMirror-2.0/lib/codemirror.css" />
+			<!-- clike -->
+			<script http-equiv="content-script-type" content="text/javascript" src="../ext-4.0.7/CodeMirror-2.0/mode/clike/clike.js"></script>
+			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/CodeMirror-2.0/mode/clike/clike.css" />
+			<!-- Common Styles for the examples -->
+			<style type="text/css">
+			.x-panel-body p {
+				margin:10px;
+			}
+			.container {
+				padding:10px;
+			}
+			em.cfg { font-style: italic; font-weight: bold;}
+			.CodeMirror-line-numbers {
+				width: 2.2em;
+				color: #aaa;
+				background-color: #eee;
+				text-align: right;
+				margin: 0;
+				padding: 0.4em;
+				font-family: monospace;
+				font-size: 10pt;
+			}
+			</style>
 			<style type="text/css">
 				.task {
 					background-image: url(http://localhost/SEKENS/ext-4.0.7/examples/shared/icons/fam/cog.gif) !important;

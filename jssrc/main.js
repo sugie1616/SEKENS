@@ -4,42 +4,68 @@ Ext.Loader.setPath('Ext.ux.DataView', '../ext-4.0.7/examples/ux/DataView');
 Ext.require(['*']);
 Ext.onReady(function() {
 	Ext.tip.QuickTipManager.init();
+
+	Ext.define('Code', {
+		fields: ['name', 'body'],
+		extend: 'Ext.data.Model',
+		proxy: {
+			type: 'localstorage',
+			id: 'Source-Codes'
+		}
+	});
+
 	var editFile = 'test.k';
-	var mainWidth = 1000;
-		
+	var mainWidth = document.body.clientWidth;
+	var mainHeight = document.body.clientHeight;
+
 	var editorPanel = Ext.widget('form', {
 		title: 'Editor',
 		frame: true,
 		split: true,
-		width: mainWidth * 0.6,
-		height: 400,
-		animCollapse: true,
+		width: mainWidth * 0.7,
+		//height: 400,
+		//animCollapse: true,
 		margins: '0 0 0 5',
 		region: 'center',
-		fieldDefaults: {
-			labelAlign: 'left',
-		},
+		//fieldDefaults: {
+		//	labelAlign: 'left',
+		//},
 		items: [
+			//{
+			//	xtype: 'displayfield',
+			//	name: 'textarealabel',
+			//	fieldLabel: 'hoge',
+			//	value: ''
+			//},
+			//{
+			//	xtype: 'textareafield',
+			//	name: 'textarea',
+			//	id: 'textarea',
+			//	flex: 1.5,
+			//	height: 300,
+			//	width: mainWidth * 0.7,
+			//	emptyText: 'Source Code'
+			//},
 			{
-				xtype: 'displayfield',
-				name: 'textarealabel',
-				fieldLabel: editFile,
-				value: ''
-			},
-			{
-				xtype: 'textareafield',
-				name: 'textarea',
-				id: 'textarea',
-				flex: 1.5,
-				height: 200,
-				width: mainWidth * 0.55,
-				emptyText: 'Source Code',
-			},
-			{
-				xtype: 'button',
-				name: 'runbtn',
-				text: 'Run',
-				handler: function() {
+				height: 400,
+				xtype: 'uxCodeMirrorPanel',
+				title: editFile,
+				sourceCode: '/* write here some KonohaScript code */',
+				layout: 'fit',
+				parser: 'clike',
+				setId: 'konohatextarea',
+				onSave: function() {
+					var store = Ext.create('Ext.data.Store', {
+						model: "Code"
+					});
+					store.load();
+					store.add({
+						name: editFile,
+						body: this.codeMirrorEditor.getValue()
+					});
+					store.sync();
+				},
+				Run: function() {
 					var worker = new Worker(homeURL + 'cgi-bin/run.k?title=test&name=hello.k');
 					worker.onmessage = function(e) {
 						editorPanel.getForm().findField('console').setValue(e.data);
@@ -47,7 +73,9 @@ Ext.onReady(function() {
 					};
 					worker.onerror = function(e) {
 						Ext.MessageBox.hide();
-						Ext.MessageBoxlalert('Status', 'An error occurred!', function(btn) {/* do nothing */});
+						Ext.MessageBox.alert('Status', 'An error occurred!', function(btn) {
+							/* do nothing */
+						});
 					};
 					worker.postMessage("start");
 					var stopKonoha = function(btn) {
@@ -61,102 +89,61 @@ Ext.onReady(function() {
 						waitConfig: {interval:200},
 						buttons: Ext.MessageBox.CANCEL,
 						fn: stopKonoha,
-						icon: './resources/images/konoha.png'
+						icon: homeURL + 'resources/images/konoha.png'
 					});
-					//Ext.Ajax.request({
-					//	method: 'GET',
-					//	url: homeURL + 'cgi-bin/run.k',
-					//	params: {
-					//		title: 'test',
-					//		name: 'hello.k'
-					//	},
-					//	success: function(result) {
-					//		var addScript = function(url) {
-					//			var el = document.createElement("script");
-					//			el.setAttribute("src", url);
-					//			el.setAttribute("charset", "UTF-8");
-					//			document.getElementByTagName("head").item(0).appendChild(el);
-					//		};
-					//		//var resultJson = Ext.JSON.decode(result.responseText);
-					//		eval(result);
-					//		Ext.MessageBox.show({
-					//			msg: 'Running konoha, please wait...',
-					//			progressText: 'Running...',
-					//			width: 300,
-					//			wait: true,
-					//			waitConfig: {interval:200},
-					//			buttons: Ext.MessageBox.CANCEL,
-					//			fn: stopKonoha,
-					//			icon: './resources/images/konoha.png'
-					//		});
-					//		konoha_main({
-					//			failure: function() {
-					//				editorPanel.getForm().findField('console').setValue('failed!');
-					//			},
-					//			success: function(result) {
-					//				editorPanel.getForm().findField('console').setValue(result);
-					//			}
-					//		});
-					//		Ext.MessageBox.hide();
-					//	},
-					//	failure: function() {
-					//		Ext.Msg.alert('Compile failed');
-					//	},
-					//});
 				},
-			},	
-			{
-				xtype: 'button',
-				name: 'savebtn',
-				text: 'Save',
-				handler: function() {
+				Push: function() {
 					Ext.Ajax.request({
 						method: 'POST',
-					url: homeURL + 'cgi-bin/save.k',
-					params: {
-						input: editorPanel.getForm().getValues().textarea,
-					},
-					success: function(result) {
-						Ext.Msg.alert(result.responseText);
-					},
-					failure: function() {
-						Ext.Msg.alert('POST Failed');
-					},
+						url: homeURL + 'cgi-bin/push.k',
+						params: {
+							input: editorPanel.items.items[0].codeMirrorEditor.getValue()
+						},
+						success: function(result) {
+							Ext.Msg.alert(result.responseText);
+						},
+						failure: function() {
+							Ext.Msg.alert('POST Failed');
+						},
 					});
 				},
+				codeMirror: {
+					height: '100%',
+					width: '100%'
+				}
 			},
-			{
-				xtype: 'button',
-				name: 'loadbtn',
-				text: 'Load',
-				handler: function() {
-					Ext.Ajax.request({
-						method: 'POST',
-					url: homeURL + 'cgi-bin/load.k',
-					params: {
-						input: '',
-					},
-					success: function(result) {
-						Ext.Msg.alert('Loading Completed');
-						editorPanel.getForm().findField('textarea').setValue(result.responseText);
-					},
-					failure: function() {
-						Ext.Msg.alert('Loading Failed');
-					},
-					});
-				},
-			},
-			{
-				xtype: 'displayfield',
-				name: 'textarealabel',
-				fieldLabel: 'Console',
-				value: ''
-			},
+			//{
+			//	xtype: 'button',
+			//	name: 'loadbtn',
+			//	text: 'Load',
+			//	handler: function() {
+			//		Ext.Ajax.request({
+			//			method: 'POST',
+			//		url: homeURL + 'cgi-bin/load.k',
+			//		params: {
+			//			input: '',
+			//		},
+			//		success: function(result) {
+			//			Ext.Msg.alert('Loading Completed');
+			//			editorPanel.getForm().findField('textarea').setValue(result.responseText);
+			//		},
+			//		failure: function() {
+			//			Ext.Msg.alert('Loading Failed');
+			//		},
+			//		});
+			//	},
+			//},
+			//{
+			//	xtype: 'displayfield',
+			//	name: 'textarealabel',
+			//	fieldLabel: 'Console',
+			//	value: ''
+			//},
 			{
 				xtype: 'textareafield',
 				name: 'console',
 				id: 'console',
-				width: mainWidth * 0.55,
+				width: mainWidth * 0.7,
 				flex: 1,
 				emptyText: 'Console',
 			},
@@ -166,8 +153,6 @@ Ext.onReady(function() {
 	Ext.define('uSrcDirModel', {
 		extend: 'Ext.data.Model',
 		fields: [
-			//{name: 'userName', type: 'string'},
-			//{name: 'repoName', type: 'string'},
 			{name: 'name', type: 'string'}
 		]
 	});
@@ -184,11 +169,11 @@ Ext.onReady(function() {
 	var uSrcDirTree = Ext.create('Ext.tree.Panel', {
 		title: 'Directory',
 		region: 'east',
-		width: 400,
+		width: mainWidth * 0.3,
 		height: 400,
 		frame: true,
 		split: true,
-		margins: '0 0 0 5',
+		margins: '0 5 0 0',
 		//collapsible: true,
 		useArrows: true,
 		rootVisible: false,
@@ -209,50 +194,75 @@ Ext.onReady(function() {
 			//			dateIndex: 'userName',
 			//			sortable: true,
 			//		}
-		]
-	});
-
-	var mainPanel = Ext.create('Ext.panel.Panel', {
-		frame: true,
-		split: true,
-		margins: '0 0 0 5',
-		region: 'center',
-		title: editFile,
-		layout: {
-			type: 'table',
-			columns: 2
-		},
-		items: [
-			editorPanel,
-			uSrcDirTree,
 		],
 	});
 
-
-	var mainTabPanel = Ext.create('Ext.tab.Panel', {
-		frame: true,
-		split: true,
-		region: 'center',
-		margins: '0 0 0 5',
-		title: userName,
-		items: [
-	//	mainPanel,
-	//		new Ext.Viewport({
-	//			layout: 'border',
-	//			items: [
-	//				editorPanel,
-	//				uSrcDirTree,
-	//			]
-	//		}),
-			mainPanel,
-		],
+	uSrcDirTree.addListener('itemdblclick', function(view, record, item, index, e, eOpts) {
+		if (record.raw.leaf) {
+			/* leaf item */
+			Ext.Ajax.request({
+				method: 'GET',
+				url: homeURL + 'cgi-bin/load.k',
+				params: {
+					title: record.parentNode.raw.name,
+					name: record.raw.name
+				},
+				success: function(result) {
+					var json = Ext.JSON.decode(result.responseText);
+					if (json['script'] != null) {
+						editorPanel.items.items[0].codeMirrorEditor.setValue(json['script']);
+					}
+				},
+				failure: function() {
+					Ext.Msg.alert('POST Failed');
+				}
+			});
+		}
 	});
 
-	var northPanel = Ext.create('Ext.panel.Panel', {
+	//var mainPanel = Ext.create('Ext.panel.Panel', {
+	//	frame: true,
+	//	split: true,
+	//	margins: '0 0 0 5',
+	//	region: 'center',
+	//	title: editFile,
+	//	layout: {
+	//		type: 'table',
+	//		columns: 2
+	//	},
+	//	items: [
+	//		editorPanel,
+	//		uSrcDirTree,
+	//	],
+	//});
+
+
+	//var mainTabPanel = Ext.create('Ext.panel.Panel', {
+	//	frame: true,
+	//	split: true,
+	//	region: 'center',
+	//	margins: '0 0 0 5',
+	//	title: userName,
+	//	items: [
+	//		editorPanel,
+	//		uSrcDirTree
+	////	mainPanel,
+	////		new Ext.Viewport({
+	////			layout: 'border',
+	////			items: [
+	////				editorPanel,
+	////				uSrcDirTree,
+	////			]
+	////		}),
+	//		//mainPanel,
+	//	],
+	//});
+
+	var navigationPanel = Ext.create('Ext.panel.Panel', {
 		frame: true,
 		split: true,
-		margins: '0 0 0 5',
-		title: editFile,
+		margins: '5 5 0 5',
+		title: 'Navigation',
 		region: 'north',
 		items:[
 			{
@@ -267,12 +277,11 @@ Ext.onReady(function() {
 						method: 'POST',
 						url: homeURL + 'cgi-bin/logout.k',
 						success: function(result) {
-							//Ext.Msg.alert('Logout Completed');
 							Ext.util.Cookies.clear("SID", "/");
 							location.reload();
 						},
 						failure: function() {
-							//Ext.Msg.alert('Logout Failed');
+							Ext.Msg.alert('Logout Failed');
 						}
 					});
 				}
@@ -282,9 +291,15 @@ Ext.onReady(function() {
 	
 	new Ext.Viewport({
 		layout: 'border',
+		defaults: {
+			collapsible: true,
+			bodyStyle: 'padding:5px'
+		},
 		items:[
-			northPanel,
-			mainTabPanel,
+			navigationPanel,
+			//mainTabPanel,
+			editorPanel,
+			uSrcDirTree
 		]
 	});
 });
