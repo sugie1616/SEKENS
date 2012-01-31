@@ -21,6 +21,7 @@ void main()
 	}
 	else {
 		html = html.replace("%script%", "main.js");
+	html = html.replace("top.js", "main.js");
 	}
 
 	OUT << "Content-Type: text/html\n" << EOL;

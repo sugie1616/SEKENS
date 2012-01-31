@@ -182,7 +182,7 @@ Ext.onReady(function() {
 				width: 80,
 				handler: function() {
 					var debugEl = Ext.get("debug");
-					var param = "username=" + formPanel.getForm().getValues().username + "&password1=" + formPanel.getForm().getValues().password1;
+					var param = "username=" + formPanel.getForm().getValues().username + "&password=" + formPanel.getForm().getValues().password1;
 					Ext.Ajax.request({
 						method: 'GET',
 						url: homeURL + 'cgi-bin/register.k',
@@ -204,7 +204,7 @@ Ext.onReady(function() {
 				width: 80,
 				handler: function() {
 					var debugEl = Ext.get("debug");
-					var param = "username=" + formPanel.getForm().getValues().username + "&password1=" + formPanel.getForm().getValues().password1;
+					var param = "username=" + formPanel.getForm().getValues().username + "&password=" + formPanel.getForm().getValues().password1;
 					Ext.Ajax.request({
 						method: 'GET',
 						url: homeURL + 'cgi-bin/login.k',
