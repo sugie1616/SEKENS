@@ -101,17 +101,17 @@ Ext.onReady(function() {
 				return (value === password1.getValue()) ? true : 'Passwords do not match.'
 			}
 		},
-		{
-			xtype: 'displayfield',
-			value: 'Debug:',
-		},
-		{
-			xtype: 'textfield',
-			name: 'debug',
-			id: 'debug',
-			height: 300,
-		},
-
+//		{
+//			xtype: 'displayfield',
+//			value: 'Debug:',
+//		},
+//		{
+//			xtype: 'textfield',
+//			name: 'debug',
+//			id: 'debug',
+//			height: 300,
+//		},
+//
 		],
 
 		dockedItems: [{
@@ -189,7 +189,7 @@ Ext.onReady(function() {
 						
 						params: param,
 						success: function(result) {
-							debugEl.dom.innerHTML = result.responseText;
+//							debugEl.dom.innerHTML = result.responseText;
 						},
 						failure: function() {
 						},
