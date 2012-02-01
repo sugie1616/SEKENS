@@ -4,6 +4,52 @@ Ext.Loader.setPath('Ext.ux.DataView', '../ext-4.0.7/examples/ux/DataView');
 Ext.require(['*']);
 Ext.onReady(function() {
 	Ext.tip.QuickTipManager.init();
+	var repotitle = 'Repository';
+	var filename = 'notitle.k';
+	var mainWidth = document.body.clientWidth;
+	var mainHeight = document.body.clientHeight;
+	var json_alert = function(result) {
+		var json = Ext.JSON.decode(result.responseText);
+		if (json['error'] != null) {
+			Ext.MessageBox.show({
+				title: 'Error',
+				msg: json['error'],
+				icon: Ext.MessageBox.ERROR,
+				buttons: Ext.MessageBox.OK
+			});
+			return null;
+		}
+		return json;
+	};
+	var runKonoha = function(title, name) {
+		var worker = new Worker(homeURL + 'cgi-bin/run.k?title=' + title + '&name=' + name);
+		worker.onmessage = function(e) {
+			editorPanel.getChildByElement('console').setValue(e.data);
+			Ext.MessageBox.hide();
+		};
+		worker.onerror = function(e) {
+			Ext.MessageBox.hide();
+			Ext.MessageBox.show({
+					title: 'Error',
+					msg: 'An error occurred!',
+					icon: Ext.MessageBox.ERROR,
+					buttons: Ext.MessageBox.OK
+			});
+		};
+		worker.postMessage("start");
+		Ext.MessageBox.show({
+				msg: 'Running konoha, please wait...',
+				progressText: 'Running...',
+				width: 300,
+				wait: true,
+				waitConfig: {interval:200},
+				buttons: Ext.MessageBox.CANCEL,
+				fn: function(btn) {
+					worker.terminate();
+				},
+				icon: homeURL + 'resources/images/konoha.png'
+		});
+	};
 
 	Ext.define('Code', {
 		fields: ['name', 'body'],
@@ -14,15 +60,18 @@ Ext.onReady(function() {
 		}
 	});
 
-	var editFile = 'test.k';
-	var mainWidth = document.body.clientWidth;
-	var mainHeight = document.body.clientHeight;
+	Ext.define('uSrcDirModel', {
+		extend: 'Ext.data.Model',
+		fields: [
+			{name: 'name', type: 'string'}
+		]
+	});
 
-	var editorPanel = Ext.widget('form', {
-		title: 'Editor',
+	var editorPanel = Ext.create('Ext.panel.Panel', {
+		title: repotitle,
 		frame: true,
 		split: true,
-		width: mainWidth * 0.7,
+		//width: mainWidth * 0.7,
 		//height: 400,
 		//animCollapse: true,
 		margins: '0 0 0 5',
@@ -48,59 +97,73 @@ Ext.onReady(function() {
 			//},
 			{
 				height: 400,
+				width: mainWidth * 0.7,
 				xtype: 'uxCodeMirrorPanel',
-				title: editFile,
+				title: filename,
 				sourceCode: '/* write here some KonohaScript code */',
 				layout: 'fit',
 				parser: 'clike',
-				setId: 'konohatextarea',
+				setId: 'ktextarea',
 				onSave: function() {
 					var store = Ext.create('Ext.data.Store', {
 						model: "Code"
 					});
 					store.load();
 					store.add({
-						name: editFile,
+						name: this.title,
 						body: this.codeMirrorEditor.getValue()
 					});
 					store.sync();
 				},
 				Run: function() {
-					var worker = new Worker(homeURL + 'cgi-bin/run.k?title=test&name=hello.k');
-					worker.onmessage = function(e) {
-						editorPanel.getForm().findField('console').setValue(e.data);
-						Ext.MessageBox.hide();
-					};
-					worker.onerror = function(e) {
-						Ext.MessageBox.hide();
-						Ext.MessageBox.alert('Status', 'An error occurred!', function(btn) {
-							/* do nothing */
+					var requrl = homeURL + 'cgi-bin/run.k';
+					if (repotitle == 'Repository' && filename == 'notitle.k') {
+						/* test run */
+						Ext.Ajax.request({
+							method: 'POST',
+							url: homeURL + 'cgi-bin/save.k',
+							params: {
+								title: repotitle,
+								name: filename,
+								script: editorPanel.getChildByElement('ktextarea').codeMirrorEditor.getValue()
+							},
+							success: function(result) {
+								var json = json_alert(result);
+								if (json != null) {
+									//Ext.MessageBox.show({
+									//	title: 'Result',
+									//	msg: json['result'],
+									//	icon: Ext.MessageBox.OK,
+									//	buttons: Ext.MessageBox.OK
+									//});
+									runKonoha(repotitle, filename);
+								}
+							},
+							failure: function() {
+								Ext.Msg.alert('POST Failed');
+							},
 						});
-					};
-					worker.postMessage("start");
-					var stopKonoha = function(btn) {
-						worker.terminate();
-					};
-					Ext.MessageBox.show({
-						msg: 'Running konoha, please wait...',
-						progressText: 'Running...',
-						width: 300,
-						wait: true,
-						waitConfig: {interval:200},
-						buttons: Ext.MessageBox.CANCEL,
-						fn: stopKonoha,
-						icon: homeURL + 'resources/images/konoha.png'
-					});
+					} else {
+						runKonoha(repotitle, filename);
+					}
 				},
 				Push: function() {
 					Ext.Ajax.request({
 						method: 'POST',
 						url: homeURL + 'cgi-bin/push.k',
 						params: {
-							input: editorPanel.items.items[0].codeMirrorEditor.getValue()
+							input: editorPanel.getChildByElement('ktextarea').codeMirrorEditor.getValue()
 						},
 						success: function(result) {
-							Ext.Msg.alert(result.responseText);
+							var json = json_alert(result);
+							if (json != null) {
+								Ext.MessageBox.show({
+									title: 'Result',
+									msg: json['result'],
+									icon: Ext.MessageBox.OK,
+									buttons: Ext.MessageBox.OK
+								});
+							}
 						},
 						failure: function() {
 							Ext.Msg.alert('POST Failed');
@@ -150,13 +213,6 @@ Ext.onReady(function() {
 		]
 	});
 
-	Ext.define('uSrcDirModel', {
-		extend: 'Ext.data.Model',
-		fields: [
-			{name: 'name', type: 'string'}
-		]
-	});
-
 	var uSrcDirStore = Ext.create('Ext.data.TreeStore', {
 		model: 'uSrcDirModel',
 		proxy: {
@@ -199,19 +255,25 @@ Ext.onReady(function() {
 
 	uSrcDirTree.addListener('itemdblclick', function(view, record, item, index, e, eOpts) {
 		if (record.raw.leaf) {
+			repotitle = record.parentNode.raw.name;
+			filename = record.raw.name;
 			/* leaf item */
 			Ext.Ajax.request({
 				method: 'GET',
 				url: homeURL + 'cgi-bin/load.k',
 				params: {
-					title: record.parentNode.raw.name,
-					name: record.raw.name
+					title: repotitle,
+					name: filename
 				},
 				success: function(result) {
 					var json = Ext.JSON.decode(result.responseText);
 					if (json['script'] != null) {
-						editorPanel.items.items[0].codeMirrorEditor.setValue(json['script']);
+						editorPanel.getChildByElement('ktextarea').codeMirrorEditor.setValue(json['script']);
+					} else {
+						editorPanel.getChildByElement('ktextarea').codeMirrorEditor.setValue("");
 					}
+					editorPanel.setTitle(repotitle);
+					editorPanel.getChildByElement('ktextarea').setTitle(filename);
 				},
 				failure: function() {
 					Ext.Msg.alert('POST Failed');
@@ -235,7 +297,6 @@ Ext.onReady(function() {
 	//		uSrcDirTree,
 	//	],
 	//});
-
 
 	//var mainTabPanel = Ext.create('Ext.panel.Panel', {
 	//	frame: true,

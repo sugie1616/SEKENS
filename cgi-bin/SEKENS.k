@@ -24,11 +24,8 @@ class SEKENS
 			<!-- Loading CodeMirror Template files -->
 			<script type="text/javascript" src="../ext-4.0.7/CodeMirror-2.0/lib/codemirror.js"></script>
 			<script type="text/javascript" src="../jssrc/data.js"></script>
+			<!-- konoha.compiler.js -->
 			<script type="text/javascript" src="../jssrc/konoha.js"></script>
-			<script type="text/javascript" src="../jssrc/js.js"></script>
-			<script type="text/javascript" src="../jssrc/js.dom.js"></script>
-			<script type="text/javascript" src="../jssrc/jquery-1.7.1.min.js"></script>
-			<script type="text/javascript" src="../jssrc/js.jquery.js"></script>
 			%username%
 			<script type="text/javascript" src="../jssrc/%script%"></script>
 			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/CodeMirror-2.0/lib/codemirror.css" />

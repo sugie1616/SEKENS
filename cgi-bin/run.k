@@ -36,9 +36,22 @@ void main() {
 	OUT.println("Content-Type: text/javascript\n");
 	Cgi cgi = new Cgi();
 
-	InputStream ins = new InputStream("../jssrc/konoha.js");
-	foreach (String line in ins) {
-		OUT.println(line);
+	String[] files = [
+		"../jssrc/konoha.js",
+		"../jssrc/konoha.math.js",
+		//"../jssrc/jquery-1.7.1.min.js",
+		"../jssrc/js.js",
+		"../jssrc/js.dom.js",
+		"../jssrc/js.jquery.js"
+	];
+
+	foreach (String file in files) {
+		InputStream ins = new InputStream(file);
+		foreach (String line in ins) {
+			OUT.println(line);
+		}
+		OUT.println();
+		OUT.flush();
 	}
 
 	String script_name = cgi.params["name"];
