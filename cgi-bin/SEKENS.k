@@ -60,6 +60,8 @@ class SEKENS
 					background-image: url(http://localhost/SEKENS/ext-4.0.7/examples/shared/icons/fam/folder_go.gif) !important;
 				}
 			</style>
+			<!-- sekens style sheet -->
+			<link rel="stylesheet" type="text/css" href="../css/sekens.css" />
 		</head>
 		<body>
 		</body>

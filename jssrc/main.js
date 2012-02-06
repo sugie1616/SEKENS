@@ -20,11 +20,14 @@ Ext.define('uSrcDirModel', {
 
 Ext.onReady(function() {
 	Ext.tip.QuickTipManager.init();
+	var todo = function() {
+		Ext.Msg.alert('TODO', 'Coming soon.');
+	};
 	var data = {
 		repo: 'Repository',
 		name: 'notitle.k',
 		body: '/* write here some KonohaScript code */'
-	}
+	};
 	var mainWidth = document.body.clientWidth;
 	var mainHeight = document.body.clientHeight;
 	var store = Ext.create('Ext.data.Store', {
@@ -102,10 +105,10 @@ Ext.onReady(function() {
 					color: 'blue'
 				},
 				html: (function() {
-					if (j['out'] == null) {
+					if (json['out'] == null) {
 						return '<p>out: </p>';
 					} else {
-						return '<p>out: </p><p>' + j['out'] + '</p>';
+						return '<p>out: </p><p>' + json['out'] + '</p>';
 					}
 				})()
 			});
@@ -115,10 +118,10 @@ Ext.onReady(function() {
 					color: 'red'
 				},
 				html: (function() {
-					if (j['err'] == null) {
+					if (json['err'] == null) {
 						return '<p>err: </p>';
 					} else {
-						return '<p>err: </p><p>' + j['err'] + '</p>';
+						return '<p>err: </p><p>' + json['err'] + '</p>';
 					}
 				})()
 			});
@@ -149,7 +152,7 @@ Ext.onReady(function() {
 				fn: function(btn) {
 					worker.terminate();
 				},
-				icon: homeURL + 'resources/images/konoha.png'
+				icon: 'konoha-running'
 		});
 	};
 	var loadScript = function(title, name, success) {
@@ -187,6 +190,15 @@ Ext.onReady(function() {
 				}
 			});
 	};
+	var storeScript = function(title, name, script) {
+		store.load();
+		store.add({
+			repo: title,
+			name: name,
+			body: script
+		});
+		store.sync();
+	};
 
 	var editorPanel = Ext.create('Ext.panel.Panel', {
 		title: data.repo,
@@ -211,18 +223,7 @@ Ext.onReady(function() {
 				parser: 'clike',
 				setId: 'ktextarea',
 				onSave: function() {
-					//store.load({
-					//		callback: function(records, operation, success) {
-					//			console.log(records);
-					//		}
-					//});
-					store.load();
-					store.add({
-							repo: editorPanel.title,
-							name: this.title,
-							body: this.codeMirrorEditor.getValue()
-					});
-					store.sync();
+					storeScript(editorPanel.title, this.title, this.codeMirrorEditor.getValue());
 				},
 				Run: function() {
 					var requrl = homeURL + 'cgi-bin/run.k';
@@ -237,12 +238,12 @@ Ext.onReady(function() {
 									fn: function(btn) {
 										switch (btn) {
 										case 'yes':
-											saveScript(data.repo, data.name, function(result) {
+											saveScript(data.repo, data.name, current, function(result) {
 												runKonoha(data.repo, data.name);
 											});
 											break;
 										case 'no':
-											saveScript('Repository', 'notitle.k', function(result) {
+											saveScript('Repository', 'notitle.k', current, function(result) {
 												runKonoha('Repository', 'notitle.k');
 											});
 											break;
@@ -284,27 +285,28 @@ Ext.onReady(function() {
 					//}
 				},
 				Push: function() {
-					Ext.Ajax.request({
-						method: 'POST',
-						url: homeURL + 'cgi-bin/push.k',
-						params: {
-							input: editorPanel.getChildByElement('ktextarea').codeMirrorEditor.getValue()
-						},
-						success: function(result) {
-							var json = json_alert(result);
-							if (json != null) {
-								Ext.MessageBox.show({
-									title: 'Result',
-									msg: json['result'],
-									icon: Ext.MessageBox.OK,
-									buttons: Ext.MessageBox.OK
-								});
-							}
-						},
-						failure: function() {
-							Ext.Msg.alert('POST Failed');
-						},
-					});
+					todo();
+					//Ext.Ajax.request({
+					//	method: 'POST',
+					//	url: homeURL + 'cgi-bin/push.k',
+					//	params: {
+					//		input: editorPanel.getChildByElement('ktextarea').codeMirrorEditor.getValue()
+					//	},
+					//	success: function(result) {
+					//		var json = json_alert(result);
+					//		if (json != null) {
+					//			Ext.MessageBox.show({
+					//				title: 'Result',
+					//				msg: json['result'],
+					//				icon: Ext.MessageBox.OK,
+					//				buttons: Ext.MessageBox.OK
+					//			});
+					//		}
+					//	},
+					//	failure: function() {
+					//		Ext.Msg.alert('POST Failed');
+					//	},
+					//});
 				},
 				codeMirror: {
 					height: '100%',
@@ -315,7 +317,7 @@ Ext.onReady(function() {
 				xtype: 'panel',
 				name: 'console',
 				id: 'console',
-				html: '<div id="console-out"></div><div id="console-err"></div>',
+				html: '<div id="console-out" style="font-family: monospace;"></div><div id="console-err" style="font-family: monospace;"></div>',
 				width: mainWidth * 0.7,
 				height: 100
 			}
@@ -461,4 +463,3 @@ Ext.onReady(function() {
 		]
 	});
 });
-
