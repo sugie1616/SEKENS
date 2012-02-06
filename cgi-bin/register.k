@@ -37,7 +37,11 @@ class Register
 
 	boolean createUserDir() {
 		String userdir = G_USER_DIR + userName;
-		return mkdir(userdir, 0775)
+		if (mkdir(userdir, 0775)) {
+			String tmpdir = userdir + "/Repository";
+			return mkdir(tmpdir, 0775);
+		}
+		return false;
 	}
 }
 

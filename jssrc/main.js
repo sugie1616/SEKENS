@@ -3,7 +3,7 @@ Ext.Loader.setPath('Ext.ux.DataView', '../ext-4.0.7/examples/ux/DataView');
 Ext.require(['*']);
 
 Ext.define('Code', {
-	fields: ['repo', 'name', 'body'],
+	fields: ['user', 'repo', 'name', 'body'],
 	extend: 'Ext.data.Model',
 	proxy: {
 		type: 'localstorage',
@@ -23,19 +23,22 @@ Ext.onReady(function() {
 	var todo = function() {
 		Ext.Msg.alert('TODO', 'Coming soon.');
 	};
-	var data = {
-		repo: 'Repository',
-		name: 'notitle.k',
-		body: '/* write here some KonohaScript code */'
-	};
 	var mainWidth = document.body.clientWidth;
 	var mainHeight = document.body.clientHeight;
 	var store = Ext.create('Ext.data.Store', {
 		model: "Code"
 	});
+	var data = {
+		user: userName,
+		repo: 'Repository',
+		name: 'notitle.k',
+		body: '/* write here some KonohaScript code */\nprint "hello, world";'
+	};
 	store.load();
 	if (store.last() != null) {
-		data = store.last().data;
+		if (store.last().data.user == data.user) {
+			data = store.last().data;
+		}
 	}
 	var json_alert = function(result) {
 		var json = Ext.JSON.decode(result.responseText);
@@ -98,6 +101,16 @@ Ext.onReady(function() {
 				}
 				showCanvas(json['document']['_context'], width, height);
 			}
+			function escapeText(text) {
+				text = text.replace(/&/g, '&amp;');
+				text = text.replace(/</g, '&lt;');
+				text = text.replace(/>/g, '&gt;');
+				text = text.replace(/"/g, '&quot;');
+				text = text.replace(/ /g, '&nbsp;');
+				text = text.replace(/\r\n/g, '<br>');
+				text = text.replace(/(\n|\r)/g, '<br>');
+				return text;
+			}
 			//var el = document.createElement('span');
 			Ext.DomHelper.overwrite('console-out', {
 				tag: 'div',
@@ -106,9 +119,9 @@ Ext.onReady(function() {
 				},
 				html: (function() {
 					if (json['out'] == null) {
-						return '<p>out: </p>';
+						return '';
 					} else {
-						return '<p>out: </p><p>' + json['out'] + '</p>';
+						return '<p>' + escapeText(json['out']) + '</p>';
 					}
 				})()
 			});
@@ -119,9 +132,9 @@ Ext.onReady(function() {
 				},
 				html: (function() {
 					if (json['err'] == null) {
-						return '<p>err: </p>';
+						return '';
 					} else {
-						return '<p>err: </p><p>' + json['err'] + '</p>';
+						return '<p>' + escapeText(json['err']) + '</p>';
 					}
 				})()
 			});

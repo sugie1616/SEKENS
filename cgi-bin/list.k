@@ -37,6 +37,7 @@ void main(String[] args)
 
 	Map[] tree = [];
 	foreach (String repo in git_repos) {
+		if (repo == "Repository") continue;
 		Map m = {};
 		m["name"] = repo;
 		String repo_dir = user_dir + repo + "/";
