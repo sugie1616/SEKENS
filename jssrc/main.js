@@ -76,6 +76,8 @@ Ext.onReady(function() {
 		}
 	};
 	var runKonoha = function(title, name) {
+		Ext.DomHelper.overwrite('console-out', {tag: 'div'});
+		Ext.DomHelper.overwrite('console-err', {tag: 'div'});
 		var worker = new Worker(homeURL + 'cgi-bin/run.k?title=' + title + '&name=' + name);
 		//var worker = new Worker(homeURL + 'jssrc/worker.js');
 		worker.onmessage = function(e) {
@@ -178,7 +180,9 @@ Ext.onReady(function() {
 				},
 				success: function(result) {
 					var json = Ext.JSON.decode(result.responseText);
-					success(json['script']);
+					if (success != null) {
+						success(json['script']);
+					}
 				},
 				failure: function() {
 					Ext.Msg.alert('POST Failed');
@@ -196,7 +200,9 @@ Ext.onReady(function() {
 				},
 				success: function(result) {
 					var json = Ext.JSON.decode(result.responseText);
-					success(json['result']);
+					if (success != null) {
+						success(json['result']);
+					}
 				},
 				failure: function() {
 					Ext.Msg.alert('POST Failed');
@@ -206,6 +212,7 @@ Ext.onReady(function() {
 	var storeScript = function(title, name, script) {
 		store.load();
 		store.add({
+			user: userName,
 			repo: title,
 			name: name,
 			body: script
@@ -243,7 +250,10 @@ Ext.onReady(function() {
 					loadScript(data.repo, data.name, function(script) {
 						var current = editorPanel.getChildByElement('ktextarea').codeMirrorEditor.getValue();
 						if (script == current) {
-							runKonoha(data.repo, data.name);
+							storeScript(data.repo, data.name, current);
+							saveScript(data.repo, data.name, current, function() {
+								runKonoha(data.repo, data.name);
+							});
 						} else {
 							Ext.MessageBox.show({
 									msg: "'" + data.repo + "/" + data.name + "' has been modified. Save changes?",
