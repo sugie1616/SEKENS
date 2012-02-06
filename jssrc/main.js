@@ -3,7 +3,7 @@ Ext.Loader.setPath('Ext.ux.DataView', '../ext-4.0.7/examples/ux/DataView');
 Ext.require(['*']);
 
 Ext.define('Code', {
-	fields: ['name', 'body'],
+	fields: ['repo', 'name', 'body'],
 	extend: 'Ext.data.Model',
 	proxy: {
 		type: 'localstorage',
@@ -20,10 +20,20 @@ Ext.define('uSrcDirModel', {
 
 Ext.onReady(function() {
 	Ext.tip.QuickTipManager.init();
-	var repotitle = 'Repository';
-	var filename = 'notitle.k';
+	var data = {
+		repo: 'Repository',
+		name: 'notitle.k',
+		body: '/* write here some KonohaScript code */'
+	}
 	var mainWidth = document.body.clientWidth;
 	var mainHeight = document.body.clientHeight;
+	var store = Ext.create('Ext.data.Store', {
+		model: "Code"
+	});
+	store.load();
+	if (store.last() != null) {
+		data = store.last().data;
+	}
 	var json_alert = function(result) {
 		var json = Ext.JSON.decode(result.responseText);
 		if (json['error'] != null) {
@@ -37,9 +47,8 @@ Ext.onReady(function() {
 		}
 		return json;
 	};
-	var win;
 	var showCanvas = function(kctx, width, height) {
-		win = Ext.create('widget.window', {
+		var win = Ext.create('widget.window', {
 				title: 'Canvas',
 				width: width + 12,
 				height: height + 35,
@@ -143,9 +152,44 @@ Ext.onReady(function() {
 				icon: homeURL + 'resources/images/konoha.png'
 		});
 	};
+	var loadScript = function(title, name, success) {
+			Ext.Ajax.request({
+				method: 'GET',
+				url: homeURL + 'cgi-bin/load.k',
+				params: {
+					title: title,
+					name: name
+				},
+				success: function(result) {
+					var json = Ext.JSON.decode(result.responseText);
+					success(json['script']);
+				},
+				failure: function() {
+					Ext.Msg.alert('POST Failed');
+				}
+			});
+	};
+	var saveScript = function(title, name, script, success) {
+			Ext.Ajax.request({
+				method: 'POST',
+				url: homeURL + 'cgi-bin/save.k',
+				params: {
+					title: title,
+					name: name,
+					script: script
+				},
+				success: function(result) {
+					var json = Ext.JSON.decode(result.responseText);
+					success(json['result']);
+				},
+				failure: function() {
+					Ext.Msg.alert('POST Failed');
+				}
+			});
+	};
 
 	var editorPanel = Ext.create('Ext.panel.Panel', {
-		title: repotitle,
+		title: data.repo,
 		frame: true,
 		split: true,
 		//width: mainWidth * 0.7,
@@ -158,27 +202,58 @@ Ext.onReady(function() {
 		//},
 		items: [
 			{
-				height: 100,
+				height: 400,
 				width: mainWidth * 0.7,
 				xtype: 'uxCodeMirrorPanel',
-				title: filename,
-				sourceCode: '/* write here some KonohaScript code */',
+				title: data.name,
+				sourceCode: data.body,
 				layout: 'fit',
 				parser: 'clike',
 				setId: 'ktextarea',
 				onSave: function() {
-					var store = Ext.create('Ext.data.Store', {
-						model: "Code"
-					});
+					//store.load({
+					//		callback: function(records, operation, success) {
+					//			console.log(records);
+					//		}
+					//});
 					store.load();
 					store.add({
-						name: this.title,
-						body: this.codeMirrorEditor.getValue()
+							repo: editorPanel.title,
+							name: this.title,
+							body: this.codeMirrorEditor.getValue()
 					});
 					store.sync();
 				},
 				Run: function() {
 					var requrl = homeURL + 'cgi-bin/run.k';
+					loadScript(data.repo, data.name, function(script) {
+						var current = editorPanel.getChildByElement('ktextarea').codeMirrorEditor.getValue();
+						if (script == current) {
+							runKonoha(data.repo, data.name);
+						} else {
+							Ext.MessageBox.show({
+									msg: "'" + data.repo + "/" + data.name + "' has been modified. Save changes?",
+									buttons: Ext.MessageBox.YESNOCANCEL,
+									fn: function(btn) {
+										switch (btn) {
+										case 'yes':
+											saveScript(data.repo, data.name, function(result) {
+												runKonoha(data.repo, data.name);
+											});
+											break;
+										case 'no':
+											saveScript('Repository', 'notitle.k', function(result) {
+												runKonoha('Repository', 'notitle.k');
+											});
+											break;
+										case 'cancel':
+											break;
+										}
+									},
+									icon: Ext.MessageBox.QUESTION
+							});
+						}
+					});
 					//if (repotitle == 'Repository' && filename == 'notitle.k') {
 					//	/* test run */
 					//	Ext.Ajax.request({
@@ -206,7 +281,6 @@ Ext.onReady(function() {
 					//		},
 					//	});
 					//} else {
-						runKonoha(repotitle, filename);
 					//}
 				},
 				Push: function() {
@@ -243,7 +317,7 @@ Ext.onReady(function() {
 				id: 'console',
 				html: '<div id="console-out"></div><div id="console-err"></div>',
 				width: mainWidth * 0.7,
-				height: 200
+				height: 100
 			}
 		]
 	});
@@ -261,7 +335,7 @@ Ext.onReady(function() {
 		title: 'Directory',
 		region: 'east',
 		width: mainWidth * 0.3,
-		height: 400,
+		//height: 400,
 		frame: true,
 		split: true,
 		margins: '0 5 0 0',
@@ -290,29 +364,17 @@ Ext.onReady(function() {
 
 	uSrcDirTree.addListener('itemdblclick', function(view, record, item, index, e, eOpts) {
 		if (record.raw.leaf) {
-			repotitle = record.parentNode.raw.name;
-			filename = record.raw.name;
+			data.repo = record.parentNode.raw.name;
+			data.name = record.raw.name;
 			/* leaf item */
-			Ext.Ajax.request({
-				method: 'GET',
-				url: homeURL + 'cgi-bin/load.k',
-				params: {
-					title: repotitle,
-					name: filename
-				},
-				success: function(result) {
-					var json = Ext.JSON.decode(result.responseText);
-					if (json['script'] != null) {
-						editorPanel.getChildByElement('ktextarea').codeMirrorEditor.setValue(json['script']);
-					} else {
-						editorPanel.getChildByElement('ktextarea').codeMirrorEditor.setValue("");
-					}
-					editorPanel.setTitle(repotitle);
-					editorPanel.getChildByElement('ktextarea').setTitle(filename);
-				},
-				failure: function() {
-					Ext.Msg.alert('POST Failed');
+			loadScript(data.repo, data.name, function(script) {
+				if (script != null) {
+					editorPanel.getChildByElement('ktextarea').codeMirrorEditor.setValue(script);
+				} else {
+					editorPanel.getChildByElement('ktextarea').codeMirrorEditor.setValue("");
 				}
+				editorPanel.setTitle(data.repo);
+				editorPanel.getChildByElement('ktextarea').setTitle(data.name);
 			});
 		}
 	});
