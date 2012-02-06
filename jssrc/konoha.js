@@ -39,29 +39,30 @@ konoha.Method.prototype = new konoha.Object();
 konoha.Class.prototype.konohaclass = "konoha.Method";
 
 /* OutputStream */
-konoha.OutputStream = function(isCwb) {
+konoha.OutputStream = function(isCwb, out) {
     this.cwb = "";
+	this.out = out;
     this.println = function() {
-        konoha.OUT += (this.cwb);
+		konoha[this.out] += (this.cwb);
         this.cwb = "";
         for (var i=0; i < arguments.length; i++) {
             if (arguments[i].rawptr) {
-                konoha.OUT += arguments[i].toString();
+				konoha[this.out] += arguments[i].toString();
             } else {
-                konoha.OUT += arguments[i];
+				konoha[this.out] += arguments[i];
             }
         }
-        konoha.OUT += '\n';
+		konoha[this.out] += '\n';
     }
     this.print = function() {
-        konoha.OUT += (this.cwb);
+		konoha[this.out] += (this.cwb);
         this.cwb = "";
         for (var i=0; i < arguments.length; i++) {
-            konoha.OUT += (arguments[i].rawptr);
+			konoha[this.out] += (arguments[i].rawptr);
             if (arguments[i].rawptr) {
-                konoha.OUT += (arguments[i].toString());
+				konoha[this.out] += (arguments[i].toString());
             } else {
-                konoha.OUT += (arguments[i]);
+				konoha[this.out] += (arguments[i]);
             }
 
         }
@@ -69,13 +70,13 @@ konoha.OutputStream = function(isCwb) {
 
     if (!isCwb) {
         this.send = function() {
-            konoha.OUT += (this.cwb);
+			konoha[this.out] += (this.cwb);
             this.cwb = "";
             for (var i = 0; i < arguments.length; i++) {
                 if (arguments[i].rawptr) {
-                    konoha.OUT += (arguments[i].toString());
+					konoha[this.out] += (arguments[i].toString());
                 } else {
-                    konoha.OUT += (arguments[i]);
+					konoha[this.out] += (arguments[i]);
                 }
             }
         }
@@ -105,11 +106,11 @@ konoha.System = function() {
 konoha.System.prototype = new konoha.Object();
 konoha.System.prototype.konohaclass = "konoha.System";
 konoha.System.getOut = function() {
-    var os = new konoha.OutputStream(false);
+    var os = new konoha.OutputStream(false, "OUT");
     return os;
 }
 konoha.System.getErr = function() {
-    var os = new konoha.OutputStream(false);
+    var os = new konoha.OutputStream(false, "ERR");
     return os;
 }
 
