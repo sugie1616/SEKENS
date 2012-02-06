@@ -148,7 +148,7 @@ class SEKENS
 	/* added by Wakamori */
 	@Static boolean saveScript(Path path, String body) {
 		OutputStream ous = new OutputStream(path);
-		ous << body;
+		ous.println(body);
 		ous.flush();
 		ous.close();
 		return true;
@@ -160,6 +160,9 @@ class SEKENS
 		String script = "";
 		foreach (String line in ins) {
 			script += line + "\n";
+		}
+		if (script.size > 0) {
+			script = script.substring(0, script.size - 1);
 		}
 		return script;
 	}
