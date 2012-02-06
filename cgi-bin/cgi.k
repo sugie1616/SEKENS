@@ -59,7 +59,7 @@ class Cgi
 		Map<String> m = {};
 		foreach (String param in input.split("&")) {
 			String[] k_v = param.split("=");
-			m[k_v[0]] = k_v[1];
+			m[k_v[0]] = k_v[1].convert(to:durl);
 		}
 		return m;
 	}
@@ -77,7 +77,7 @@ class Cgi
 		} else {
 			throw new Script!!("unknown method '" + method + "'");
 		}
-		_params = parseQuery(query.convert(to:durl));
+		_params = parseQuery(query);
 		_cookies = new Cookie($env.HTTP_COOKIE);
 	}
 }

@@ -1,7 +1,23 @@
 Ext.Loader.setConfig({enabled: true});
 Ext.Loader.setPath('Ext.ux.DataView', '../ext-4.0.7/examples/ux/DataView');
-
 Ext.require(['*']);
+
+Ext.define('Code', {
+	fields: ['name', 'body'],
+	extend: 'Ext.data.Model',
+	proxy: {
+		type: 'localstorage',
+		id: 'Source-Codes'
+	}
+});
+
+Ext.define('uSrcDirModel', {
+	extend: 'Ext.data.Model',
+	fields: [
+		{name: 'name', type: 'string'}
+	]
+});
+
 Ext.onReady(function() {
 	Ext.tip.QuickTipManager.init();
 	var repotitle = 'Repository';
@@ -21,10 +37,87 @@ Ext.onReady(function() {
 		}
 		return json;
 	};
+	var win;
+	var showCanvas = function(kctx, width, height) {
+		win = Ext.create('widget.window', {
+				title: 'Canvas',
+				width: width + 12,
+				height: height + 35,
+				html: '<div id="canvas-body"></div>'
+		});
+		win.show();
+		Ext.DomHelper.append('canvas-body', {
+			id: 'konoha-canvas',
+			tag: 'canvas',
+			width: width,
+			height: height
+		});
+		var canvas = Ext.getDom('konoha-canvas');
+		var ctx = canvas.getContext('2d');
+		for (var i = 0; i < kctx['2d'][0]._rect.length; i++) {
+			var rect = kctx['2d'][0]._rect[i];
+			ctx.fillStyle = rect._style.rawptr;
+			ctx.fillRect(rect._x, rect._y, rect._w, rect._h);
+		}
+	};
 	var runKonoha = function(title, name) {
 		var worker = new Worker(homeURL + 'cgi-bin/run.k?title=' + title + '&name=' + name);
+		//var worker = new Worker(homeURL + 'jssrc/worker.js');
 		worker.onmessage = function(e) {
-			editorPanel.getChildByElement('console').setValue(e.data);
+			var json = Ext.JSON.decode(e.data);
+			if (json['document']['_context']['2d'].length > 0) {
+				var body = json['document']._elems.body._elems[0];
+				var width = 300;
+				var height = 300;
+				if (body != null) {
+					for (var i = 0; i < body._child.length; i++) {
+						var node = body._child[i];
+						if (node.nodeName == "Canvas") {
+							for (var j = 0; j < node._attributes.length; j++) {
+								var attr = node._attributes[j];
+								if (attr.indexOf("width") >= 0) {
+									width = parseInt(attr.split("=")[1]);
+								} else if (attr.indexOf("height") >= 0) {
+									height = parseInt(attr.split("=")[1]);
+								}
+							}
+						}
+					}
+				}
+				showCanvas(json['document']['_context'], width, height);
+			}
+			//var el = document.createElement('span');
+			Ext.DomHelper.overwrite('console-out', {
+				tag: 'div',
+				style: {
+					color: 'blue'
+				},
+				html: (function() {
+					if (j['out'] == null) {
+						return '<p>out: </p>';
+					} else {
+						return '<p>out: </p><p>' + j['out'] + '</p>';
+					}
+				})()
+			});
+			Ext.DomHelper.overwrite('console-err', {
+				tag: 'div',
+				style: {
+					color: 'red'
+				},
+				html: (function() {
+					if (j['err'] == null) {
+						return '<p>err: </p>';
+					} else {
+						return '<p>err: </p><p>' + j['err'] + '</p>';
+					}
+				})()
+			});
+			//el.innerHTML = j['out'];
+			//el.style.color = '##0000ff';
+			//editorPanel.getChildByElement('console').setRawValueWithColor('hi', 'red');
+			//editorPanel.getChildByElement('console')
+			//editorPanel.getChildByElement('console').setValue(el);
 			Ext.MessageBox.hide();
 		};
 		worker.onerror = function(e) {
@@ -51,22 +144,6 @@ Ext.onReady(function() {
 		});
 	};
 
-	Ext.define('Code', {
-		fields: ['name', 'body'],
-		extend: 'Ext.data.Model',
-		proxy: {
-			type: 'localstorage',
-			id: 'Source-Codes'
-		}
-	});
-
-	Ext.define('uSrcDirModel', {
-		extend: 'Ext.data.Model',
-		fields: [
-			{name: 'name', type: 'string'}
-		]
-	});
-
 	var editorPanel = Ext.create('Ext.panel.Panel', {
 		title: repotitle,
 		frame: true,
@@ -80,23 +157,8 @@ Ext.onReady(function() {
 		//	labelAlign: 'left',
 		//},
 		items: [
-			//{
-			//	xtype: 'displayfield',
-			//	name: 'textarealabel',
-			//	fieldLabel: 'hoge',
-			//	value: ''
-			//},
-			//{
-			//	xtype: 'textareafield',
-			//	name: 'textarea',
-			//	id: 'textarea',
-			//	flex: 1.5,
-			//	height: 300,
-			//	width: mainWidth * 0.7,
-			//	emptyText: 'Source Code'
-			//},
 			{
-				height: 400,
+				height: 100,
 				width: mainWidth * 0.7,
 				xtype: 'uxCodeMirrorPanel',
 				title: filename,
@@ -117,35 +179,35 @@ Ext.onReady(function() {
 				},
 				Run: function() {
 					var requrl = homeURL + 'cgi-bin/run.k';
-					if (repotitle == 'Repository' && filename == 'notitle.k') {
-						/* test run */
-						Ext.Ajax.request({
-							method: 'POST',
-							url: homeURL + 'cgi-bin/save.k',
-							params: {
-								title: repotitle,
-								name: filename,
-								script: editorPanel.getChildByElement('ktextarea').codeMirrorEditor.getValue()
-							},
-							success: function(result) {
-								var json = json_alert(result);
-								if (json != null) {
-									//Ext.MessageBox.show({
-									//	title: 'Result',
-									//	msg: json['result'],
-									//	icon: Ext.MessageBox.OK,
-									//	buttons: Ext.MessageBox.OK
-									//});
-									runKonoha(repotitle, filename);
-								}
-							},
-							failure: function() {
-								Ext.Msg.alert('POST Failed');
-							},
-						});
-					} else {
+					//if (repotitle == 'Repository' && filename == 'notitle.k') {
+					//	/* test run */
+					//	Ext.Ajax.request({
+					//		method: 'POST',
+					//		url: homeURL + 'cgi-bin/save.k',
+					//		params: {
+					//			title: repotitle,
+					//			name: filename,
+					//			script: editorPanel.getChildByElement('ktextarea').codeMirrorEditor.getValue()
+					//		},
+					//		success: function(result) {
+					//			var json = json_alert(result);
+					//			if (json != null) {
+					//				//Ext.MessageBox.show({
+					//				//	title: 'Result',
+					//				//	msg: json['result'],
+					//				//	icon: Ext.MessageBox.OK,
+					//				//	buttons: Ext.MessageBox.OK
+					//				//});
+					//				runKonoha(repotitle, filename);
+					//			}
+					//		},
+					//		failure: function() {
+					//			Ext.Msg.alert('POST Failed');
+					//		},
+					//	});
+					//} else {
 						runKonoha(repotitle, filename);
-					}
+					//}
 				},
 				Push: function() {
 					Ext.Ajax.request({
@@ -175,41 +237,14 @@ Ext.onReady(function() {
 					width: '100%'
 				}
 			},
-			//{
-			//	xtype: 'button',
-			//	name: 'loadbtn',
-			//	text: 'Load',
-			//	handler: function() {
-			//		Ext.Ajax.request({
-			//			method: 'POST',
-			//		url: homeURL + 'cgi-bin/load.k',
-			//		params: {
-			//			input: '',
-			//		},
-			//		success: function(result) {
-			//			Ext.Msg.alert('Loading Completed');
-			//			editorPanel.getForm().findField('textarea').setValue(result.responseText);
-			//		},
-			//		failure: function() {
-			//			Ext.Msg.alert('Loading Failed');
-			//		},
-			//		});
-			//	},
-			//},
-			//{
-			//	xtype: 'displayfield',
-			//	name: 'textarealabel',
-			//	fieldLabel: 'Console',
-			//	value: ''
-			//},
 			{
-				xtype: 'textareafield',
+				xtype: 'panel',
 				name: 'console',
 				id: 'console',
+				html: '<div id="console-out"></div><div id="console-err"></div>',
 				width: mainWidth * 0.7,
-				flex: 1,
-				emptyText: 'Console',
-			},
+				height: 200
+			}
 		]
 	});
 

@@ -42,7 +42,8 @@ void main() {
 		//"../jssrc/jquery-1.7.1.min.js",
 		"../jssrc/js.js",
 		"../jssrc/js.dom.js",
-		"../jssrc/js.jquery.js"
+		"../jssrc/js.jquery.js",
+		"../jssrc/worker.js"
 	];
 
 	foreach (String file in files) {

@@ -152,6 +152,25 @@ js.dom.Gradient.prototype = new konoha.Object();
 js.dom.Element = function(rawptr) {
     this.rawptr = rawptr;
     this.konohaclass = "js.dom.Element";
+	this._context = {
+		'2d': new function() {
+			var rect = function(x, y, w, h, style) {
+				this._x = x;
+				this._y = y;
+				this._w = w;
+				this._h = h;
+				this._style = style;
+			}
+			this._rect = [];
+			this._fillstyle = null;
+			this.fillRect = function(x, y, w, h) {
+				this._rect.push(new rect(x, y, w, h, this._fillstyle));
+			};
+			this.setFillStyle = function(sty) {
+				this._fillstyle = sty;
+			};
+		}
+	};
     this.getTagName = function() {
         return this.rawptr.tagName;
     }
@@ -180,6 +199,10 @@ js.dom.Element = function(rawptr) {
     this.hasAttribute = function(name) {
         return this.rawptr.hasAttribute(name);
     }
+	this.getContext = function(str) {
+		document.setCanvasContext(str, this._context[str]);
+		return this._context[str];
+	};
 }
 js.dom.Element.prototype = new js.dom.Node();
 js.dom.Context = function(rawptr) {
