@@ -15,6 +15,8 @@ class SEKENS
 		<head>
 			<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 			<title>SEKENS</title>
+			<!-- sekens style sheet -->
+			<link rel="stylesheet" type="text/css" href="../css/sekens.css" />
 			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/resources/css/ext-all.css"/>
 			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/examples/shared/example.css"/>
 			<link rel="stylesheet" type="text/css" href="../resources/peers.css"/>
@@ -60,8 +62,6 @@ class SEKENS
 					background-image: url(http://localhost/SEKENS/ext-4.0.7/examples/shared/icons/fam/folder_go.gif) !important;
 				}
 			</style>
-			<!-- sekens style sheet -->
-			<link rel="stylesheet" type="text/css" href="../css/sekens.css" />
 		</head>
 		<body>
 		</body>

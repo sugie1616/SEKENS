@@ -156,13 +156,13 @@ Ext.onReady(function() {
 					buttons: Ext.MessageBox.OK
 			});
 		};
-		worker.postMessage("start");
+		worker.postMessage(JSON.stringify({
+			type: 'start',
+			async: true
+		}));
 		Ext.MessageBox.show({
 				msg: 'Running konoha, please wait...',
 				progressText: 'Running...',
-				width: 300,
-				wait: true,
-				waitConfig: {interval:200},
 				buttons: Ext.MessageBox.CANCEL,
 				fn: function(btn) {
 					worker.terminate();
@@ -235,7 +235,7 @@ Ext.onReady(function() {
 		items: [
 			{
 				height: 400,
-				width: mainWidth * 0.7,
+				width: 600,
 				xtype: 'uxCodeMirrorPanel',
 				title: data.name,
 				sourceCode: data.body,
@@ -340,8 +340,9 @@ Ext.onReady(function() {
 				xtype: 'panel',
 				name: 'console',
 				id: 'console',
+				resizable: true,
+				autoScroll: true,
 				html: '<div id="console-out" style="font-family: monospace;"></div><div id="console-err" style="font-family: monospace;"></div>',
-				width: mainWidth * 0.7,
 				height: 100
 			}
 		]
@@ -469,6 +470,9 @@ Ext.onReady(function() {
 					});
 				}
 			}
+			//{
+			//	xtype: 'button',
+			//	text: '
 		]
 	});
 	

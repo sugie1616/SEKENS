@@ -87,8 +87,6 @@ Ext.define('Ext.ux.panel.CodeMirror', {
                 hidden: false,
                 inputId: this.setId,
                 value: this.sourceCode
-                
-                
             }],
             tbar: [{
                 text: 'Save',
