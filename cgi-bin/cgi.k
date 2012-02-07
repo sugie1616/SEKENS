@@ -71,7 +71,10 @@ class Cgi
 		}
 		String query = "";
 		if (method == "POST") {
-			query = System.readLine();
+			int len = (to int)$env.CONTENT_LENGTH;
+			Bytes b = new byte[len];
+			IN.read(b, len - 1);
+			query = b.decode();
 		} else if (method == "GET") {
 			query = $env.QUERY_STRING;
 		} else {
