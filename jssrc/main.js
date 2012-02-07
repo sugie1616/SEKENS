@@ -234,8 +234,10 @@ Ext.onReady(function() {
 		//},
 		items: [
 			{
+				resizable: true,
+				//minHeight: 300,
+				//maxHeight: 400,
 				height: 400,
-				width: 600,
 				xtype: 'uxCodeMirrorPanel',
 				title: data.name,
 				sourceCode: data.body,

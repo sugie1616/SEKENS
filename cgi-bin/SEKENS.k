@@ -25,10 +25,9 @@ class SEKENS
 			<script type="text/javascript" src="../ext-4.0.7/Ext.ux.panel.CodeMirror.js"></script>
 			<!-- Loading CodeMirror Template files -->
 			<script type="text/javascript" src="../ext-4.0.7/CodeMirror-2.0/lib/codemirror.js"></script>
-			<script type="text/javascript" src="../jssrc/data.js"></script>
 			<!-- konoha.compiler.js -->
 			<!--<script type="text/javascript" src="../jssrc/konoha.js"></script>-->
-			%username%
+			%jscode%
 			<script type="text/javascript" src="../jssrc/%script%"></script>
 			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/CodeMirror-2.0/lib/codemirror.css" />
 			<!-- clike -->
