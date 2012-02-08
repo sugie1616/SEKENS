@@ -18,6 +18,8 @@ Ext.define('uSrcDirModel', {
 	]
 });
 
+var editorPanel;
+
 Ext.onReady(function() {
 	Ext.tip.QuickTipManager.init();
 	var todo = function() {
@@ -220,7 +222,8 @@ Ext.onReady(function() {
 		store.sync();
 	};
 
-	var editorPanel = Ext.create('Ext.panel.Panel', {
+	//var editorPanel = Ext.create('Ext.panel.Panel', {
+	editorPanel = Ext.create('Ext.panel.Panel', {
 		title: data.repo,
 		frame: true,
 		split: true,
@@ -233,7 +236,11 @@ Ext.onReady(function() {
 		//	labelAlign: 'left',
 		//},
 		items: [
-			{
+		]
+	});
+
+	editorPanel.addListener('resize', function(component, eOpts) {
+		editorPanel.add({
 				resizable: true,
 				//minHeight: 300,
 				//maxHeight: 400,
@@ -337,8 +344,8 @@ Ext.onReady(function() {
 					height: '100%',
 					width: '100%'
 				}
-			},
-			{
+		});
+		editorPanel.add({
 				xtype: 'panel',
 				name: 'console',
 				id: 'console',
@@ -346,17 +353,18 @@ Ext.onReady(function() {
 				autoScroll: true,
 				html: '<div id="console-out" style="font-family: monospace;"></div><div id="console-err" style="font-family: monospace;"></div>',
 				height: 100
-			}
-		]
+		});
+	}, this, {
+		single: true
 	});
 
 	var uSrcDirStore = Ext.create('Ext.data.TreeStore', {
-		model: 'uSrcDirModel',
-		proxy: {
-			type: 'ajax',
-			url: homeURL + 'cgi-bin/list.k'
-		},
-		folderSort: true
+			model: 'uSrcDirModel',
+			proxy: {
+				type: 'ajax',
+				url: homeURL + 'cgi-bin/list.k'
+			},
+			folderSort: true
 	});
 
 	var uSrcDirTree = Ext.create('Ext.tree.Panel', {
