@@ -46,6 +46,15 @@ void main(String[] args)
 		return;
 	}
 
+	String subj_script = cgi.params["script"];
+	if (subj_script == null) {
+		j = new Json();
+		j["success"] = "false";
+		j["msg"] = "Parameter 'script' is not given.";
+		OUT << j.stringify() << EOL;
+		return;
+	}
+
 	String sid = cgi.cookies["SID"]["val"];
 	if (sid == null) {
 		j = new Json();
@@ -65,9 +74,7 @@ void main(String[] args)
 		return;
 	}
 
-	String user_dir = G_USER_DIR + username + "/";
-
-	String create_dir = user_dir + repo_title + "/";
+	String create_dir = G_GIT_DIR + repo_title + "/";
 	if (mkdir(create_dir, 0775) == false) {
 		j = new Json();
 		j["success"] = "false";
@@ -76,16 +83,9 @@ void main(String[] args)
 		return;
 	}
 
-	String create_gitdir = create_dir + ".git";
-	if (mkdir(create_gitdir, 0775) == false) {
-		j = new Json();
-		j["success"] = "false";
-		j["msg"] = "mkdir '" + create_gitdir + "' failed";
-		OUT << j.stringify() << EOL;
-		return;
-	}
+	String gitdir = create_dir + ".git";
 
-	Git git = new Git(create_gitdir);
+	Git git = new Git(gitdir);
 	git.init();
 
 	j = new Json();

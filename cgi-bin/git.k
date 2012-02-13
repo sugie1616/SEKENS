@@ -1,6 +1,6 @@
 class Git {
 	String path;
-	String git_dir;
+	String gitdir;
 	String cmd;
 	String home;
 
@@ -9,16 +9,16 @@ class Git {
 		if (path == "") {
 			throw new Script!!("git is not installed");
 		}
-		_git_dir = gitdir;
-		if (git_dir == null) {
+		_gitdir = gitdir;
+		if (gitdir == null) {
 			cmd = path;
 			home = ".";
 		} else {
-			if (git_dir.endsWith("/")) {
-				_git_dir = git_dir.substring(0, git_dir.size - 1);
+			if (gitdir.endsWith("/")) {
+				_gitdir = gitdir.substring(0, gitdir.size - 1);
 			}
-			cmd = path + " --git-dir=" + git_dir;
-			home = git_dir.substring(0, git_dir.size - 4);
+			cmd = path + " --git-dir=" + gitdir;
+			home = gitdir.substring(0, gitdir.size - 4);
 		}
 	}
 

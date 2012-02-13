@@ -27,7 +27,9 @@ class Run
 	
 	String evalKonoha() {
 		String script_path = G_USER_DIR + user + "/" + repo + "/" + script;
-		String resultcode = exec("/usr/local/bin/konohac --emit-js " + script_path);
+		String cmd = "export JS_GEN_HTML=false; export JS_USE_WORKER=true; ";
+		cmd += "/usr/local/bin/konohac --emit-js ";
+		String resultcode = exec(cmd + script_path);
 		return resultcode;
 	}
 }

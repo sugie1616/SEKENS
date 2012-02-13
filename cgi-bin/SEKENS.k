@@ -30,9 +30,9 @@ class SEKENS
 			%jscode%
 			<script type="text/javascript" src="../jssrc/%script%"></script>
 			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/CodeMirror-2.0/lib/codemirror.css" />
-			<!-- clike -->
-			<script http-equiv="content-script-type" content="text/javascript" src="../ext-4.0.7/CodeMirror-2.0/mode/clike/clike.js"></script>
-			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/CodeMirror-2.0/mode/clike/clike.css" />
+			<!-- CodeMirror javascript mode -->
+			<script http-equiv="content-script-type" content="text/javascript" src="../ext-4.0.7/CodeMirror-2.0/mode/javascript/javascript.js"></script>
+			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/CodeMirror-2.0/mode/javascript/javascript.css" />
 			<!-- Common Styles for the examples -->
 			<style type="text/css">
 			.x-panel-body p {

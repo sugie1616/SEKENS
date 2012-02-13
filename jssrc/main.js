@@ -255,7 +255,7 @@ Ext.onReady(function() {
 				title: data.name,
 				sourceCode: data.body,
 				layout: 'fit',
-				parser: 'clike',
+				parser: 'javascript',
 				setId: 'ktextarea',
 				onSave: function() {
 					storeScript(editorPanel.title, this.title, this.codeMirrorEditor.getValue());
