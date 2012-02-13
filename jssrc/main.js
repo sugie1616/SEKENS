@@ -63,14 +63,15 @@ Ext.onReady(function() {
 		}
 		return json;
 	};
+	var canvasWindow;
 	var showCanvas = function(kctx, width, height) {
-		var win = Ext.create('widget.window', {
+		canvasWindow = Ext.create('widget.window', {
 				title: 'Canvas',
 				width: width + 12,
 				height: height + 35,
 				html: '<div id="canvas-body"></div>'
 		});
-		win.show();
+		canvasWindow.show();
 		Ext.DomHelper.append('canvas-body', {
 			id: 'konoha-canvas',
 			tag: 'canvas',
@@ -86,6 +87,9 @@ Ext.onReady(function() {
 		}
 	};
 	var runKonoha = function(title, name) {
+		if (canvasWindow != null) {
+			canvasWindow.destroy();
+		}
 		Ext.DomHelper.overwrite('console-out', {tag: 'div'});
 		Ext.DomHelper.overwrite('console-err', {tag: 'div'});
 		var worker = new Worker(homeURL + 'cgi-bin/run.k?title=' + title + '&name=' + name);
