@@ -78,15 +78,25 @@ void main(String[] args)
 	if (mkdir(create_dir, 0775) == false) {
 		j = new Json();
 		j["success"] = "false";
-		j["msg"] = "mkdir '" + create_dir + "' failed";
+		j["msg"] = "Subject '" + repo_title + "' already exists.";
 		OUT << j.stringify() << EOL;
 		return;
 	}
 
-	String gitdir = create_dir + ".git";
-
-	Git git = new Git(gitdir);
+	System.chdir(create_dir);
+	Git git = new Git();
 	git.init();
+	OutputStream readme = new OutputStream("README");
+	readme.println(repo_desc);
+	readme.flush();
+	readme.close();
+	git.add("README");
+	OutputStream sample_script = new OutputStream("example.k");
+	sample_script.println(subj_script);
+	sample_script.flush();
+	sample_script.close();
+	git.add("example.k");
+	git.commit("first commit");
 
 	j = new Json();
 	j["success"] = "true";

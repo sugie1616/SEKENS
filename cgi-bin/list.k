@@ -48,7 +48,8 @@ void main(String[] args)
 	}
 
 	OUT.println("[");
-	foreach (Map node in tree) {
+	for (int i = 0; i < tree.size; i++) {
+		Map node = tree[i];
 		OUT.println("	{");
 		OUT.println("		\"name\": \"" + node["name"] + "\",");
 		OUT.println("		\"children\": [");
@@ -60,7 +61,11 @@ void main(String[] args)
 			OUT.println("			},");
 		}
 		OUT.println("		]");
-		OUT.println("	},");
+		if (i < tree.size - 1) {
+			OUT.println("	},");
+		} else {
+			OUT.println("	}");
+		}
 	}
 	OUT.println("]");
 }

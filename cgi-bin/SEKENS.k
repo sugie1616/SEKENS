@@ -1,5 +1,6 @@
 #!/usr/local/bin/konoha
 
+using konoha.io.*;
 using konoha.uuid.*;
 using konoha.sql.*;
 using konoha.json.*;
@@ -156,14 +157,7 @@ class SEKENS
 	/* added by Wakamori */
 	@Static String loadScript(Path path) {
 		InputStream ins = new InputStream(path);
-		String script = "";
-		foreach (String line in ins) {
-			script += line + "\n";
-		}
-		if (script.size > 0) {
-			script = script.substring(0, script.size - 1);
-		}
-		return script;
+		return ins.read().decode().trim();
 	}
 
 	@Static String err2json(String errtxt) {

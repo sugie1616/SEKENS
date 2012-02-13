@@ -46,7 +46,10 @@ class Git {
 		return exec("cd " + home + " && " + cmd + " diff");
 	}
 
-	String init() {
-		return exec(cmd + " --bare init");
+	String init(boolean bare) {
+		if (bare) {
+			return exec(cmd + " --bare init");
+		}
+		return exec(cmd + " init");
 	}
 }

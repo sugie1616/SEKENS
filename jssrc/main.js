@@ -20,9 +20,9 @@ Ext.define('uSrcDirModel', {
 
 Ext.apply(Ext.form.field.VTypes, {
 		nospace: function(val, field) {
-			return (/^[a-zA-Z0-9\.\-_]*$/g).test(val);
+			return (/^[a-zA-Z0-9\.\-_]+$/g).test(val);
 		},
-		nospaceText: 'Not a valid name. Must not be include blank spaces.',
+		nospaceText: 'Not a valid name. Must not be include multibyte characters.',
 		nospaceMask: /[a-zA-Z0-9\.\-_]/i
 });
 
@@ -89,7 +89,6 @@ Ext.onReady(function() {
 		Ext.DomHelper.overwrite('console-out', {tag: 'div'});
 		Ext.DomHelper.overwrite('console-err', {tag: 'div'});
 		var worker = new Worker(homeURL + 'cgi-bin/run.k?title=' + title + '&name=' + name);
-		//var worker = new Worker(homeURL + 'jssrc/worker.js');
 		worker.onmessage = function(e) {
 			var json = Ext.JSON.decode(e.data);
 			if (json['document']['_context']['2d'].length > 0) {
@@ -123,7 +122,6 @@ Ext.onReady(function() {
 				text = text.replace(/(\n|\r)/g, '<br>');
 				return text;
 			}
-			//var el = document.createElement('span');
 			Ext.DomHelper.overwrite('console-out', {
 				tag: 'div',
 				style: {
@@ -150,11 +148,6 @@ Ext.onReady(function() {
 					}
 				})()
 			});
-			//el.innerHTML = j['out'];
-			//el.style.color = '##0000ff';
-			//editorPanel.getChildByElement('console').setRawValueWithColor('hi', 'red');
-			//editorPanel.getChildByElement('console')
-			//editorPanel.getChildByElement('console').setValue(el);
 			Ext.MessageBox.hide();
 		};
 		worker.onerror = function(e) {
@@ -230,26 +223,17 @@ Ext.onReady(function() {
 		store.sync();
 	};
 
-	//var editorPanel = Ext.create('Ext.panel.Panel', {
 	editorPanel = Ext.create('Ext.panel.Panel', {
 		title: data.repo,
 		frame: true,
 		split: true,
-		//width: mainWidth * 0.7,
-		//height: 400,
-		//animCollapse: true,
 		margins: '0 0 0 5',
-		region: 'center',
-		//fieldDefaults: {
-		//	labelAlign: 'left',
-		//},
+		region: 'center'
 	});
 
 	editorPanel.addListener('resize', function(component, eOpts) {
 		editorPanel.add({
 				resizable: true,
-				//minHeight: 300,
-				//maxHeight: 400,
 				height: 400,
 				xtype: 'uxCodeMirrorPanel',
 				title: data.name,
@@ -292,58 +276,9 @@ Ext.onReady(function() {
 							});
 						}
 					});
-					//if (repotitle == 'Repository' && filename == 'notitle.k') {
-					//	/* test run */
-					//	Ext.Ajax.request({
-					//		method: 'POST',
-					//		url: homeURL + 'cgi-bin/save.k',
-					//		params: {
-					//			title: repotitle,
-					//			name: filename,
-					//			script: editorPanel.getChildByElement('ktextarea').codeMirrorEditor.getValue()
-					//		},
-					//		success: function(result) {
-					//			var json = json_alert(result);
-					//			if (json != null) {
-					//				//Ext.MessageBox.show({
-					//				//	title: 'Result',
-					//				//	msg: json['result'],
-					//				//	icon: Ext.MessageBox.OK,
-					//				//	buttons: Ext.MessageBox.OK
-					//				//});
-					//				runKonoha(repotitle, filename);
-					//			}
-					//		},
-					//		failure: function() {
-					//			Ext.Msg.alert('POST Failed');
-					//		},
-					//	});
-					//} else {
-					//}
 				},
 				Push: function() {
 					todo();
-					//Ext.Ajax.request({
-					//	method: 'POST',
-					//	url: homeURL + 'cgi-bin/push.k',
-					//	params: {
-					//		input: editorPanel.getChildByElement('ktextarea').codeMirrorEditor.getValue()
-					//	},
-					//	success: function(result) {
-					//		var json = json_alert(result);
-					//		if (json != null) {
-					//			Ext.MessageBox.show({
-					//				title: 'Result',
-					//				msg: json['result'],
-					//				icon: Ext.MessageBox.OK,
-					//				buttons: Ext.MessageBox.OK
-					//			});
-					//		}
-					//	},
-					//	failure: function() {
-					//		Ext.Msg.alert('POST Failed');
-					//	},
-					//});
 				},
 				codeMirror: {
 					height: '100%',
@@ -376,16 +311,12 @@ Ext.onReady(function() {
 		title: 'Directory',
 		region: 'east',
 		width: mainWidth * 0.3,
-		//height: 400,
 		frame: true,
 		split: true,
 		margins: '0 5 0 0',
-		//collapsible: true,
 		useArrows: true,
 		rootVisible: false,
 		store: uSrcDirStore,
-		//multiSelect: true,
-		//singleExpand: true,
 		columns: [
 			{
 				xtype: 'treecolumn',
@@ -393,13 +324,7 @@ Ext.onReady(function() {
 				flex: 1.5,
 				sortable: true,
 				dataIndex: 'name'
-			},
-			//		{
-			//			text: 'Name',
-			//			flex: 1,
-			//			dateIndex: 'userName',
-			//			sortable: true,
-			//		}
+			}
 		],
 	});
 
@@ -419,43 +344,6 @@ Ext.onReady(function() {
 			});
 		}
 	});
-
-	//var mainPanel = Ext.create('Ext.panel.Panel', {
-	//	frame: true,
-	//	split: true,
-	//	margins: '0 0 0 5',
-	//	region: 'center',
-	//	title: editFile,
-	//	layout: {
-	//		type: 'table',
-	//		columns: 2
-	//	},
-	//	items: [
-	//		editorPanel,
-	//		uSrcDirTree,
-	//	],
-	//});
-
-	//var mainTabPanel = Ext.create('Ext.panel.Panel', {
-	//	frame: true,
-	//	split: true,
-	//	region: 'center',
-	//	margins: '0 0 0 5',
-	//	title: userName,
-	//	items: [
-	//		editorPanel,
-	//		uSrcDirTree
-	////	mainPanel,
-	////		new Ext.Viewport({
-	////			layout: 'border',
-	////			items: [
-	////				editorPanel,
-	////				uSrcDirTree,
-	////			]
-	////		}),
-	//		//mainPanel,
-	//	],
-	//});
 
 	var createForm = Ext.create('Ext.form.Panel', {
 		url: homeURL + 'cgi-bin/create.k',
@@ -490,11 +378,11 @@ Ext.onReady(function() {
 		title: 'Create a subject',
 		layout: 'fit',
 		plain: true,
-		width: 700,
+		width: mainWidth * 0.7,
 		items: createForm,
 		closeAction: 'hide',
 		buttons: [{
-			text: 'Create',
+			text: 'OK',
 			handler: function() {
 				var form = createForm.getForm();
 				if (form.isValid()) {
@@ -569,7 +457,6 @@ Ext.onReady(function() {
 		},
 		items:[
 			navigationPanel,
-			//mainTabPanel,
 			editorPanel,
 			uSrcDirTree
 		]
