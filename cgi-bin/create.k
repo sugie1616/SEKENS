@@ -7,7 +7,9 @@
  * @param cookie['SID']		sid
  * @param title				title of new repository
  * @param desc				description of new repository
- * @return json['result']	result message
+ * @param script			script of sample program
+ * @param json['success']	true if successed
+ * @return json['msg']		result message
  * @return json['error']	error message
  */
 
@@ -28,26 +30,38 @@ void main(String[] args)
 
 	String repo_title = cgi.params["title"];
 	if (repo_title == null) {
-		OUT << SEKENS.err2json("Parameter 'title' is not given.") << EOL;
+		j = new Json();
+		j["success"] = "false";
+		j["msg"] = "Parameter 'title' is not given.";
+		OUT << j.stringify() << EOL;
 		return;
 	}
 
 	String repo_desc = cgi.params["desc"];
 	if (repo_desc == null) {
-		OUT << SEKENS.err2json("Parameter 'desc' is not given.") << EOL;
+		j = new Json();
+		j["success"] = "false";
+		j["msg"] = "Parameter 'desc' is not given.";
+		OUT << j.stringify() << EOL;
 		return;
 	}
 
 	String sid = cgi.cookies["SID"]["val"];
 	if (sid == null) {
-		OUT << SEKENS.err2json("sid is not found") << EOL;
+		j = new Json();
+		j["success"] = "false";
+		j["msg"] = "sid is not found";
+		OUT << j.stringify() << EOL;
 		return;
 	}
 
 	Json j = SEKENS.checkSID(sid);
 	String username = j["username"];
 	if (username == null) {
-		OUT << SEKENS.err2json("username is not found") << EOL;
+		j = new Json();
+		j["success"] = "false";
+		j["msg"] = "username is not found";
+		OUT << j.stringify() << EOL;
 		return;
 	}
 
@@ -55,13 +69,19 @@ void main(String[] args)
 
 	String create_dir = user_dir + repo_title + "/";
 	if (mkdir(create_dir, 0775) == false) {
-		OUT << SEKENS.err2json("mkdir '" + create_dir + "' failed") << EOL;
+		j = new Json();
+		j["success"] = "false";
+		j["msg"] = "mkdir '" + create_dir + "' failed";
+		OUT << j.stringify() << EOL;
 		return;
 	}
 
 	String create_gitdir = create_dir + ".git";
 	if (mkdir(create_gitdir, 0775) == false) {
-		OUT << SEKENS.err2json("mkdir '" + create_gitdir + "' failed") << EOL;
+		j = new Json();
+		j["success"] = "false";
+		j["msg"] = "mkdir '" + create_gitdir + "' failed";
+		OUT << j.stringify() << EOL;
 		return;
 	}
 
@@ -69,6 +89,7 @@ void main(String[] args)
 	git.init();
 
 	j = new Json();
-	j["result"] = "create repository successed";
+	j["success"] = "true";
+	j["msg"] = "create repository successed";
 	OUT << j.stringify() << EOL;
 }

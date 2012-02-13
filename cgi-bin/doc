@@ -25,7 +25,6 @@ void main()
 			/* [TODO] how to user username? */
 			html = html.replace("%script%", "main.js");
 			jscode = "var userName = '" + username + "';\n";
-			jscode += "var homeURL = '" + G_HOME_URL + "';\n";
 		}
 		else {
 			OUT << sekens.deleteCookie("SID");

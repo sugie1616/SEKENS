@@ -18,6 +18,14 @@ Ext.define('uSrcDirModel', {
 	]
 });
 
+Ext.apply(Ext.form.field.VTypes, {
+		nospace: function(val, field) {
+			return (/^[a-zA-Z0-9\.\-_]*$/g).test(val);
+		},
+		nospaceText: 'Not a valid name. Must not be include blank spaces.',
+		nospaceMask: /[a-zA-Z0-9\.\-_]/i
+});
+
 var editorPanel;
 
 Ext.onReady(function() {
@@ -235,8 +243,6 @@ Ext.onReady(function() {
 		//fieldDefaults: {
 		//	labelAlign: 'left',
 		//},
-		items: [
-		]
 	});
 
 	editorPanel.addListener('resize', function(component, eOpts) {
@@ -359,12 +365,12 @@ Ext.onReady(function() {
 	});
 
 	var uSrcDirStore = Ext.create('Ext.data.TreeStore', {
-			model: 'uSrcDirModel',
-			proxy: {
-				type: 'ajax',
-				url: homeURL + 'cgi-bin/list.k'
-			},
-			folderSort: true
+		model: 'uSrcDirModel',
+		proxy: {
+			type: 'ajax',
+			url: homeURL + 'cgi-bin/list.k'
+		},
+		folderSort: true
 	});
 
 	var uSrcDirTree = Ext.create('Ext.tree.Panel', {
@@ -452,6 +458,70 @@ Ext.onReady(function() {
 	//	],
 	//});
 
+	var createForm = Ext.create('Ext.form.Panel', {
+		url: homeURL + 'cgi-bin/create.k',
+		bodyPadding: 5,
+		fieldDefaults: {
+			labelWidth: 140
+		},
+		items: [{
+			xtype: 'textfield',
+			fieldLabel: 'Subject Title<br>(Git Repository Name)',
+			name: 'title',
+			vtype: 'nospace',
+			anchor: '100%'
+		}, {
+			xtype: 'textareafield',
+			fieldLabel: 'Contents of this subject',
+			name: 'desc',
+			id: 'create-desc',
+			height: 200,
+			anchor: '100%'
+		}, {
+			xtype: 'textareafield',
+			fieldLabel: 'Sample Program',
+			name: 'script',
+			id: 'create-script',
+			height: 200,
+			anchor: '100%'
+		}]
+	});
+
+	var createWindow = Ext.create('Ext.window.Window', {
+		title: 'Create a subject',
+		layout: 'fit',
+		plain: true,
+		width: 700,
+		items: createForm,
+		closeAction: 'hide',
+		buttons: [{
+			text: 'Create',
+			handler: function() {
+				var form = createForm.getForm();
+				if (form.isValid()) {
+					form.submit({
+						success: function(form, action) {
+							Ext.Msg.alert('Success', action.result.msg);
+							createWindow.hide();
+							form.reset();
+							uSrcDirStore.sync();
+						},
+						failure: function(form, action) {
+							Ext.Msg.alert('Failed', action.result.msg);
+							createWindow.hide();
+							form.reset();
+						}
+					});
+				}
+			}
+		}, {
+			text: 'Cancel',
+			handler: function() {
+				createWindow.hide();
+			}
+		}]
+	});
+
 	var navigationPanel = Ext.create('Ext.panel.Panel', {
 		frame: true,
 		split: true,
@@ -479,10 +549,16 @@ Ext.onReady(function() {
 						}
 					});
 				}
+			},
+			{
+				xtype: 'button',
+				text: 'Create a subject',
+				handler: function() {
+					if (!createWindow.isVisible()) {
+						createWindow.show();
+					}
+				}
 			}
-			//{
-			//	xtype: 'button',
-			//	text: '
 		]
 	});
 	
