@@ -261,7 +261,6 @@ Ext.onReady(function() {
 					storeScript(editorPanel.title, this.title, this.codeMirrorEditor.getValue());
 				},
 				Run: function() {
-					var requrl = homeURL + 'cgi-bin/run.k';
 					loadScript(data.repo, data.name, function(script) {
 						var current = editorPanel.getChildByElement('ktextarea').codeMirrorEditor.getValue();
 						if (script == current) {

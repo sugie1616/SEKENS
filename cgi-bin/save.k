@@ -23,26 +23,26 @@ void main(String[] args)
 	String sid = cgi.cookies["SID"]["val"];
 	Json j = SEKENS.checkSID(sid);
 	if (j == null) {
-		OUT << err2json("SID is not exist") << EOL;
+		OUT << SEKENS.err2json("SID is not exist") << EOL;
 		return;
 	}
 	String username = j["username"];
 
 	String script_name = cgi.params["name"];
 	if (script_name == null) {
-		OUT << err2json("Parameter 'name' is not given.") << EOL;
+		OUT << SEKENS.err2json("Parameter 'name' is not given.") << EOL;
 		return;
 	}
 
 	String script_body = cgi.params["script"];
 	if (script_body == null) {
-		OUT << err2json("Parameter 'script' is not given.") << EOL;
+		OUT << SEKENS.err2json("Parameter 'script' is not given.") << EOL;
 		return;
 	}
 
 	String repo_title = cgi.params["title"];
 	if (repo_title == null) {
-		OUT << err2json("Parameter 'title' is not given.") << EOL;
+		OUT << SEKENS.err2json("Parameter 'title' is not given.") << EOL;
 		return;
 	}
 
