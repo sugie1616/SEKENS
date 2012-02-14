@@ -164,10 +164,12 @@ Ext.onReady(function() {
 				}
 				break;
 			case 'exit':
-				for (var i = 0; i < json['document']['_context']['2d'][0]._rect.length; i++) {
-					var rect = json['document']['_context']['2d'][0]._rect[i];
-					ctx.fillStyle = rect._style.rawptr;
-					ctx.fillRect(rect._x, rect._y, rect._w, rect._h);
+				if (json['document']['_context']['2d'][0] != null) {
+					for (var i = 0; i < json['document']['_context']['2d'][0]._rect.length; i++) {
+						var rect = json['document']['_context']['2d'][0]._rect[i];
+						ctx.fillStyle = rect._style.rawptr;
+						ctx.fillRect(rect._x, rect._y, rect._w, rect._h);
+					}
 				}
 				documentJson = json;
 				Ext.MessageBox.hide();
@@ -269,42 +271,42 @@ Ext.onReady(function() {
 				//	}
 				//	showCanvas(json['document']['_context'], width, height);
 				//}
-				//function escapeText(text) {
-				//	text = text.replace(/&/g, '&amp;');
-				//	text = text.replace(/</g, '&lt;');
-				//	text = text.replace(/>/g, '&gt;');
-				//	text = text.replace(/"/g, '&quot;');
-				//	text = text.replace(/ /g, '&nbsp;');
-				//	text = text.replace(/\r\n/g, '<br>');
-				//	text = text.replace(/(\n|\r)/g, '<br>');
-				//	return text;
-				//}
-				//Ext.DomHelper.overwrite('console-out', {
-				//	tag: 'div',
-				//	style: {
-				//		color: 'blue'
-				//	},
-				//	html: (function() {
-				//		if (json['out'] == null) {
-				//			return '';
-				//		} else {
-				//			return '<p>' + escapeText(json['out']) + '</p>';
-				//		}
-				//	})()
-				//});
-				//Ext.DomHelper.overwrite('console-err', {
-				//	tag: 'div',
-				//	style: {
-				//		color: 'red'
-				//	},
-				//	html: (function() {
-				//		if (json['err'] == null) {
-				//			return '';
-				//		} else {
-				//			return '<p>' + escapeText(json['err']) + '</p>';
-				//		}
-				//	})()
-				//});
+				function escapeText(text) {
+					text = text.replace(/&/g, '&amp;');
+					text = text.replace(/</g, '&lt;');
+					text = text.replace(/>/g, '&gt;');
+					text = text.replace(/"/g, '&quot;');
+					text = text.replace(/ /g, '&nbsp;');
+					text = text.replace(/\r\n/g, '<br>');
+					text = text.replace(/(\n|\r)/g, '<br>');
+					return text;
+				}
+				Ext.DomHelper.overwrite('console-out', {
+					tag: 'div',
+					style: {
+						color: 'blue'
+					},
+					html: (function() {
+						if (json['out'] == null) {
+							return '';
+						} else {
+							return '<p>' + escapeText(json['out']) + '</p>';
+						}
+					})()
+				});
+				Ext.DomHelper.overwrite('console-err', {
+					tag: 'div',
+					style: {
+						color: 'red'
+					},
+					html: (function() {
+						if (json['err'] == null) {
+							return '';
+						} else {
+							return '<p>' + escapeText(json['err']) + '</p>';
+						}
+					})()
+				});
 			}
 		};
 		worker.onerror = function(e) {
