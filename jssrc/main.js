@@ -130,53 +130,86 @@ Ext.onReady(function() {
 			//	ctx2.fillStyle = json.fillStyle;
 			//	break;
 			case 'fillRect':
-				ctx.fillStyle = json.fillStyle;
-				ctx.fillRect(json.x, json.y, json.w, json.h);
+				for (var i = 0; i < json.rect.length; i++) {
+					var rect = json.rect[i];
+					ctx.fillStyle = rect._style.rawptr;
+					ctx.fillRect(rect._x, rect._y, rect._w, rect._h);
+				}
+				break;
+			case 'appendChild':
+				if (canvasWindow == null && json.child.nodeName == "Canvas") {
+					for (var j = 0; j < json.child._attributes.length; j++) {
+						var attr = json.child._attributes[j];
+						if (attr.indexOf("width") >= 0) {
+							width = parseInt(attr.split("=")[1]);
+						} else if (attr.indexOf("height") >= 0) {
+							height = parseInt(attr.split("=")[1]);
+						}
+					}
+					canvasWindow = Ext.create('widget.window', {
+						title: 'Canvas',
+						width: width + 12,
+						height: height + 35,
+						html: '<div id="canvas-body2"></div>'
+					});
+					canvasWindow.show();
+					Ext.DomHelper.append('canvas-body2', {
+						id: 'konoha-canvas2',
+						tag: 'canvas',
+						width: width,
+						height: height
+					});
+					canvas = Ext.getDom('konoha-canvas2');
+					ctx = canvas.getContext('2d');
+				}
 				break;
 			case 'exit':
+				for (var i = 0; i < json['document']['_context']['2d'][0]._rect.length; i++) {
+					var rect = json['document']['_context']['2d'][0]._rect[i];
+					ctx.fillStyle = rect._style.rawptr;
+					ctx.fillRect(rect._x, rect._y, rect._w, rect._h);
+				}
 				documentJson = json;
 				Ext.MessageBox.hide();
 			case 'progress':
-				if (json['document']['_context']['2d'].length > 0) {
-					var body = json['document']._elems.body._elems[0];
-					if (canvasWindow == null && body != null) {
-						for (var i = 0; i < body._child.length; i++) {
-							var node = body._child[i];
-							if (node.nodeName == "Canvas") {
-								for (var j = 0; j < node._attributes.length; j++) {
-									var attr = node._attributes[j];
-									if (attr.indexOf("width") >= 0) {
-										width = parseInt(attr.split("=")[1]);
-									} else if (attr.indexOf("height") >= 0) {
-										height = parseInt(attr.split("=")[1]);
-									}
-								}
-								canvasWindow = Ext.create('widget.window', {
-									title: 'Canvas',
-									width: width + 12,
-									height: height + 35,
-									html: '<div id="canvas-body2"></div>'
-								});
-								canvasWindow.show();
-								Ext.DomHelper.append('canvas-body2', {
-									id: 'konoha-canvas2',
-									tag: 'canvas',
-									width: width,
-									height: height
-								});
-								canvas = Ext.getDom('konoha-canvas2');
-								ctx = canvas.getContext('2d');
-							}
-						}
-					}
-					var i;
-					for (i = curidx; i < json['document']['_context']['2d'][0]._rect.length; i++) {
-						var rect = json['document']['_context']['2d'][0]._rect[i];
-						ctx.fillStyle = rect._style.rawptr;
-						ctx.fillRect(rect._x, rect._y, rect._w, rect._h);
-					}
-					curidx = i;
-				}
+				//if (json['document']['_context']['2d'].length > 0) {
+				//	var body = json['document']._elems.body._elems[0];
+				//	if (canvasWindow == null && body != null) {
+				//		for (var i = 0; i < body._child.length; i++) {
+				//			var node = body._child[i];
+				//			if (node.nodeName == "Canvas") {
+				//				for (var j = 0; j < node._attributes.length; j++) {
+				//					var attr = node._attributes[j];
+				//					if (attr.indexOf("width") >= 0) {
+				//						width = parseInt(attr.split("=")[1]);
+				//					} else if (attr.indexOf("height") >= 0) {
+				//						height = parseInt(attr.split("=")[1]);
+				//					}
+				//				}
+				//				canvasWindow = Ext.create('widget.window', {
+				//					title: 'Canvas',
+				//					width: width + 12,
+				//					height: height + 35,
+				//					html: '<div id="canvas-body2"></div>'
+				//				});
+				//				canvasWindow.show();
+				//				Ext.DomHelper.append('canvas-body2', {
+				//					id: 'konoha-canvas2',
+				//					tag: 'canvas',
+				//					width: width,
+				//					height: height
+				//				});
+				//				canvas = Ext.getDom('konoha-canvas2');
+				//				ctx = canvas.getContext('2d');
+				//			}
+				//		}
+				//	}
+				//for (var i = 0; i < json.rect.length; i++) {
+				//	var rect = json.rect[i]
+				//	ctx.fillStyle = rect._style.rawptr;
+				//	ctx.fillRect(rect._x, rect._y, rect._w, rect._h);
+				//}
+				//}
 				//	showCanvas(json['document']['_context'], width, height);
 				//}
 				//function escapeText(text) {

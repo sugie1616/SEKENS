@@ -13,6 +13,10 @@ var elem = function(elemname) {
 		this._attributes.push(attrname + "=" + attrval);
 	};
 	this.appendChild = function(child) {
+		postMessage(JSON.stringify({
+			'event': 'appendChild',
+			'child': child
+		}));
 		this._child.push(child);
 	};
 }

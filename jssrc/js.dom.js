@@ -174,13 +174,13 @@ js.dom.Element = function(rawptr) {
 				//	'h': h
 				//}));
 				this._rect.push(new rect(x, y, w, h, this._fillstyle));
-				this._count += 1;
-				if (this._count > 10000) {
+				if (this._rect.length > 10000) {
 					postMessage(JSON.stringify({
-						'event': 'progress',
-						'document': document
+						'event': 'fillRect',
+						'rect': this._rect
+						//'document': document
 					}));
-					this._count = 0;
+					this._rect = [];
 				}
 			};
 			this.setFillStyle = function(sty) {
