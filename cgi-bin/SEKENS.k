@@ -156,7 +156,7 @@ class SEKENS
 	/* added by Wakamori */
 	@Static String loadScript(Path path) {
 		InputStream ins = new InputStream(path);
-		return ins.read().decode().trim();
+		return ins.read().decode();
 	}
 
 	@Static String err2json(String errtxt) {
