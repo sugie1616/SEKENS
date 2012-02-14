@@ -5,6 +5,11 @@ var elem = function(elemname) {
 	this._attributes = [];
 	this._child = [];
 	this.setAttribute = function(attrname, attrval) {
+		postMessage(JSON.stringify({
+			'event': 'setAttribute',
+			'name': attrname,
+			'value': attrval
+		}));
 		this._attributes.push(attrname + "=" + attrval);
 	};
 	this.appendChild = function(child) {
@@ -32,6 +37,10 @@ var document = function() {
 		return this._elems[tagname];
 	};
 	this.createElement = function(elemname) {
+		postMessage(JSON.stringify({
+			'event': 'createElement',
+			'element': elemname
+		}));
 		return new elem(elemname);
 	};
 	this.setCanvasContext = function(str, ctx) {

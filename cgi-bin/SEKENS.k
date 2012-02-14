@@ -1,6 +1,5 @@
 #!/usr/local/bin/konoha
 
-using konoha.io.*;
 using konoha.uuid.*;
 using konoha.sql.*;
 using konoha.json.*;

@@ -64,6 +64,7 @@ Ext.onReady(function() {
 		return json;
 	};
 	var canvasWindow;
+	var canvasWindow2;
 	var showCanvas = function(kctx, width, height) {
 		canvasWindow = Ext.create('widget.window', {
 				title: 'Canvas',
@@ -93,66 +94,103 @@ Ext.onReady(function() {
 		Ext.DomHelper.overwrite('console-out', {tag: 'div'});
 		Ext.DomHelper.overwrite('console-err', {tag: 'div'});
 		var worker = new Worker(homeURL + 'cgi-bin/run.k?title=' + title + '&name=' + name);
+		var canvas2;
+		var ctx2;
 		worker.onmessage = function(e) {
 			var json = Ext.JSON.decode(e.data);
-			if (json['document']['_context']['2d'].length > 0) {
-				var body = json['document']._elems.body._elems[0];
-				var width = 300;
-				var height = 300;
-				if (body != null) {
-					for (var i = 0; i < body._child.length; i++) {
-						var node = body._child[i];
-						if (node.nodeName == "Canvas") {
-							for (var j = 0; j < node._attributes.length; j++) {
-								var attr = node._attributes[j];
-								if (attr.indexOf("width") >= 0) {
-									width = parseInt(attr.split("=")[1]);
-								} else if (attr.indexOf("height") >= 0) {
-									height = parseInt(attr.split("=")[1]);
-								}
-							}
-						}
-					}
+			switch (json.event) {
+			case 'createElement':
+				if (json.element.toLowerCase() == 'canvas') {
+					canvasWindow2 = Ext.create('widget.window', {
+							title: 'Canvas',
+							html: '<div id="canvas-body2"></div>'
+					});
+					canvasWindow2.show();
+					Ext.DomHelper.append('canvas-body2', {
+						id: 'konoha-canvas2',
+						tag: 'canvas'
+					});
+					canvas2 = Ext.getDom('konoha-canvas2');
+					ctx2 = canvas2.getContext('2d');
 				}
-				showCanvas(json['document']['_context'], width, height);
+				break;
+			case 'setAttribute':
+				if (json.name == 'width') {
+					canvasWindow2.setWidth(parseInt(json.value) + 12);
+					canvas2.width = json.value;
+				} else if (json.name == 'height') {
+					canvasWindow2.setHeight(parseInt(json.value) + 35);
+					canvas2.height = json.value;
+				}
+				break;
+			//case 'setFillStyle':
+			//	ctx2.fillStyle = json.fillStyle;
+			//	break;
+			case 'fillRect':
+				ctx2.fillStyle = json.fillStyle;
+				ctx2.fillRect(json.x, json.y, json.w, json.h);
+				break;
+			case 'exit':
+				//if (json['document']['_context']['2d'].length > 0) {
+				//	var body = json['document']._elems.body._elems[0];
+				//	var width = 300;
+				//	var height = 300;
+				//	if (body != null) {
+				//		for (var i = 0; i < body._child.length; i++) {
+				//			var node = body._child[i];
+				//			if (node.nodeName == "Canvas") {
+				//				for (var j = 0; j < node._attributes.length; j++) {
+				//					var attr = node._attributes[j];
+				//					if (attr.indexOf("width") >= 0) {
+				//						width = parseInt(attr.split("=")[1]);
+				//					} else if (attr.indexOf("height") >= 0) {
+				//						height = parseInt(attr.split("=")[1]);
+				//					}
+				//				}
+				//			}
+				//		}
+				//	}
+				//	showCanvas(json['document']['_context'], width, height);
+				//}
+				//function escapeText(text) {
+				//	text = text.replace(/&/g, '&amp;');
+				//	text = text.replace(/</g, '&lt;');
+				//	text = text.replace(/>/g, '&gt;');
+				//	text = text.replace(/"/g, '&quot;');
+				//	text = text.replace(/ /g, '&nbsp;');
+				//	text = text.replace(/\r\n/g, '<br>');
+				//	text = text.replace(/(\n|\r)/g, '<br>');
+				//	return text;
+				//}
+				//Ext.DomHelper.overwrite('console-out', {
+				//	tag: 'div',
+				//	style: {
+				//		color: 'blue'
+				//	},
+				//	html: (function() {
+				//		if (json['out'] == null) {
+				//			return '';
+				//		} else {
+				//			return '<p>' + escapeText(json['out']) + '</p>';
+				//		}
+				//	})()
+				//});
+				//Ext.DomHelper.overwrite('console-err', {
+				//	tag: 'div',
+				//	style: {
+				//		color: 'red'
+				//	},
+				//	html: (function() {
+				//		if (json['err'] == null) {
+				//			return '';
+				//		} else {
+				//			return '<p>' + escapeText(json['err']) + '</p>';
+				//		}
+				//	})()
+				//});
+				Ext.MessageBox.hide();
+				break;
 			}
-			function escapeText(text) {
-				text = text.replace(/&/g, '&amp;');
-				text = text.replace(/</g, '&lt;');
-				text = text.replace(/>/g, '&gt;');
-				text = text.replace(/"/g, '&quot;');
-				text = text.replace(/ /g, '&nbsp;');
-				text = text.replace(/\r\n/g, '<br>');
-				text = text.replace(/(\n|\r)/g, '<br>');
-				return text;
-			}
-			Ext.DomHelper.overwrite('console-out', {
-				tag: 'div',
-				style: {
-					color: 'blue'
-				},
-				html: (function() {
-					if (json['out'] == null) {
-						return '';
-					} else {
-						return '<p>' + escapeText(json['out']) + '</p>';
-					}
-				})()
-			});
-			Ext.DomHelper.overwrite('console-err', {
-				tag: 'div',
-				style: {
-					color: 'red'
-				},
-				html: (function() {
-					if (json['err'] == null) {
-						return '';
-					} else {
-						return '<p>' + escapeText(json['err']) + '</p>';
-					}
-				})()
-			});
-			Ext.MessageBox.hide();
 		};
 		worker.onerror = function(e) {
 			Ext.MessageBox.hide();

@@ -4,4 +4,4 @@ G_GIT_DIR    = G_SEKENS_DIR + "git/";
 G_USER_DIR   = G_SEKENS_DIR + "users/";
 G_USER_DB    = G_SEKENS_DIR + "db/users.sqlite3";
 G_TMP_DIR    = "/var/tmp/";
-G_HOME_URL   = "http://192.168.0.5/~chen_ji/SEKENS/";
+G_HOME_URL   = "http://localhost/~chen_ji/SEKENS/";
