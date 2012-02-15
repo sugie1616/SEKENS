@@ -336,24 +336,25 @@ Ext.onReady(function() {
 			icon: 'konoha-running'
 		});
 	};
-	var loadScript = function(title, name, success) {
-			Ext.Ajax.request({
-				method: 'GET',
-				url: homeURL + 'cgi-bin/load.k',
-				params: {
-					title: title,
-					name: name
-				},
-				success: function(result) {
-					var json = Ext.JSON.decode(result.responseText);
-					if (success != null) {
-						success(json['script'].trim());
-					}
-				},
-				failure: function() {
-					Ext.Msg.alert('POST Failed');
+	var loadScript = function(title, name, type, success) {
+		Ext.Ajax.request({
+			method: 'GET',
+			url: homeURL + 'cgi-bin/load.k',
+			params: {
+				title: title,
+				name: name,
+				type: type
+			},
+			success: function(result) {
+				var json = Ext.JSON.decode(result.responseText);
+				if (success != null) {
+					success(json['script'].trim());
 				}
-			});
+			},
+			failure: function() {
+				Ext.Msg.alert('POST Failed');
+			}
+		});
 	};
 	var saveScript = function(title, name, script, success) {
 			Ext.Ajax.request({
@@ -408,7 +409,7 @@ Ext.onReady(function() {
 					storeScript(editorPanel.title, this.title, this.codeMirrorEditor.getValue());
 				},
 				Run: function() {
-					loadScript(data.repo, data.name, function(script) {
+					loadScript(data.repo, data.name, 'answer', function(script) {
 						var current = editorPanel.getChildByElement('ktextarea').codeMirrorEditor.getValue();
 						if (script == current.trim()) {
 							storeScript(data.repo, data.name, current);
@@ -496,7 +497,11 @@ Ext.onReady(function() {
 			data.repo = record.parentNode.raw.name;
 			data.name = record.raw.name;
 			/* leaf item */
-			loadScript(data.repo, data.name, function(script) {
+			var type = 'answer';
+			if (record.parentNote.parentNote.raw == null) {
+				type = 'subject';
+			}
+			loadScript('', data.name, type, function(script) {
 				if (script != null) {
 					editorPanel.getChildByElement('ktextarea').codeMirrorEditor.setValue(script);
 				} else {
