@@ -501,7 +501,7 @@ Ext.onReady(function() {
 			if (record.parentNode.parentNode.raw == null) {
 				type = 'subject';
 			}
-			loadScript('', data.name, type, function(script) {
+			loadScript(data.repo, data.name, type, function(script) {
 				if (script != null) {
 					editorPanel.getChildByElement('ktextarea').codeMirrorEditor.setValue(script);
 				} else {
