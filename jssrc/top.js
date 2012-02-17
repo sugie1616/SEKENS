@@ -11,7 +11,7 @@ Ext.onReady(function() {
 		width: 200,
 		bodyPadding: 10,
 		bodyBorder: true,
-		title: 'Registration',
+		title: 'Sign in form',
 		region: 'center',
 		defaults: {
 			anchor: '100%'
@@ -86,21 +86,21 @@ Ext.onReady(function() {
 			allowBlank: false,
 			minLength: 4,
 		},
-		{
-			xtype: 'displayfield',
-			value: 'Repeat Password:',
-		},
-		{
-			xtype: 'textfield',
-			name: 'password2',
-			id: 'password2',
-			inputType: 'password',
-			allowBlank: false,
-			validator: function(value) {
-				var password1 = this.previousSibling('[name=password1]');
-				return (value === password1.getValue()) ? true : 'Passwords do not match.'
-			}
-		},
+		//{
+		//	xtype: 'displayfield',
+		//	value: 'Repeat Password:',
+		//},
+		//{
+		//	xtype: 'textfield',
+		//	name: 'password2',
+		//	id: 'password2',
+		//	inputType: 'password',
+		//	allowBlank: false,
+		//	validator: function(value) {
+		//		var password1 = this.previousSibling('[name=password1]');
+		//		return (value === password1.getValue()) ? true : 'Passwords do not match.'
+		//	}
+		//},
 //		{
 //			xtype: 'displayfield',
 //			value: 'Debug:',
@@ -174,50 +174,50 @@ Ext.onReady(function() {
 					}
 				}
 			},
-			{
-				xtype: 'button',
-				formBind: true,
-				disabled: true,
-				text: 'Register!',
-				width: 80,
-				handler: function() {
-					Ext.Ajax.request({
-						method: 'POST',
-						url: homeURL + 'cgi-bin/register.k',
-						
-						params: {
-							username: formPanel.getForm().getValues().username,
-							password: formPanel.getForm().getValues().password1
-						},
-						success: function(result) {
-							var json = Ext.JSON.decode(result.responseText);
-							if (json['error'] != null) {
-								Ext.MessageBox.show({
-									title: 'Error',
-									msg: json['error'],
-									icon: Ext.MessageBox.ERROR,
-									buttons: Ext.MessageBox.OK
-								});
-							} else {
-								Ext.MessageBox.show({
-									title: 'Result',
-									msg: json['result'],
-									icon: Ext.MessageBox.OK,
-									buttons: Ext.MessageBox.OK
-								});
-							}
-						},
-						failure: function() {
-							Ext.MessageBox.show({
-								title: 'Error',
-								msg: 'Register failed',
-								icon: Ext.MessageBox.ERROR,
-								buttons: Ext.MessageBox.OK
-							});
-						}
-					});
-				},
-			},
+			//{
+			//	xtype: 'button',
+			//	formBind: true,
+			//	disabled: true,
+			//	text: 'Register!',
+			//	width: 80,
+			//	handler: function() {
+			//		Ext.Ajax.request({
+			//			method: 'POST',
+			//			url: homeURL + 'cgi-bin/register.k',
+			//			
+			//			params: {
+			//				username: formPanel.getForm().getValues().username,
+			//				password: formPanel.getForm().getValues().password1
+			//			},
+			//			success: function(result) {
+			//				var json = Ext.JSON.decode(result.responseText);
+			//				if (json['error'] != null) {
+			//					Ext.MessageBox.show({
+			//						title: 'Error',
+			//						msg: json['error'],
+			//						icon: Ext.MessageBox.ERROR,
+			//						buttons: Ext.MessageBox.OK
+			//					});
+			//				} else {
+			//					Ext.MessageBox.show({
+			//						title: 'Result',
+			//						msg: json['result'],
+			//						icon: Ext.MessageBox.OK,
+			//						buttons: Ext.MessageBox.OK
+			//					});
+			//				}
+			//			},
+			//			failure: function() {
+			//				Ext.MessageBox.show({
+			//					title: 'Error',
+			//					msg: 'Register failed',
+			//					icon: Ext.MessageBox.ERROR,
+			//					buttons: Ext.MessageBox.OK
+			//				});
+			//			}
+			//		});
+			//	},
+			//},
 			{
 				xtype: 'button',
 				formBind: true,
