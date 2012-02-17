@@ -498,7 +498,7 @@ Ext.onReady(function() {
 			data.name = record.raw.name;
 			/* leaf item */
 			var type = 'answer';
-			if (record.parentNote.parentNote.raw == null) {
+			if (record.parentNode.parentNode.raw == null) {
 				type = 'subject';
 			}
 			loadScript('', data.name, type, function(script) {
