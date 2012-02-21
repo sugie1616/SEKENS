@@ -43,6 +43,15 @@ class Register
 		}
 		return false;
 	}
+
+	boolean createScript() {
+		String script = G_USER_DIR + userName + "/Repository/notitle.k";
+		OutputStream ous = new OutputStream(script);
+		ous.println();
+		ous.flush();
+		ous.close();
+		return true;
+	}
 }
 
 void main() {
@@ -57,6 +66,11 @@ void main() {
 	}
 	if (reg.createUserDir() == false) {
 		j["error"] = "create user directory failed";
+		OUT << j.stringify() << EOL;
+		return;
+	}
+	if (reg.createScrilt() == false) {
+		j["error"] = "create user script failed";
 		OUT << j.stringify() << EOL;
 		return;
 	}

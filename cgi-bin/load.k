@@ -50,10 +50,10 @@ void main(String[] args)
 		String user_dir = G_USER_DIR + user_name + "/";
 		String script_path = user_dir + repo_title + "/" + script_name;
 		String script = SEKENS.loadScript(script_path);
-		if (script == "") {
-			OUT << SEKENS.err2json("No such script.") << EOL;
-			return;
-		}
+		//if (script == "") {
+		//	OUT << SEKENS.err2json("No such script.") << EOL;
+		//	return;
+		//}
 		Json j = new Json();
 		j["result"] = "Load Successed.";
 		j["script"] = script;

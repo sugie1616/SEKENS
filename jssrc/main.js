@@ -497,10 +497,11 @@ Ext.onReady(function() {
 			data.repo = record.parentNode.raw.name;
 			data.name = record.raw.name;
 			/* leaf item */
+			//var type = 'answer';
+			//if (record.parentNode.parentNode.raw == null) {
+			//	type = 'subject';
+			//}
 			var type = 'answer';
-			if (record.parentNode.parentNode.raw == null) {
-				type = 'subject';
-			}
 			loadScript(data.repo, data.name, type, function(script) {
 				if (script != null) {
 					editorPanel.getChildByElement('ktextarea').codeMirrorEditor.setValue(script);
@@ -604,15 +605,15 @@ Ext.onReady(function() {
 						}
 					});
 				}
-			},
-			{
-				xtype: 'button',
-				text: 'Create a subject',
-				handler: function() {
-					if (!createWindow.isVisible()) {
-						createWindow.show();
-					}
-				}
+			//},
+			//{
+			//	xtype: 'button',
+			//	text: 'Create a subject',
+			//	handler: function() {
+			//		if (!createWindow.isVisible()) {
+			//			createWindow.show();
+			//		}
+			//	}
 			}
 		]
 	});

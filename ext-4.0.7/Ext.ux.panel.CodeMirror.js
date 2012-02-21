@@ -112,11 +112,11 @@ Ext.define('Ext.ux.panel.CodeMirror', {
 				iconCls: 'icoRun',
 				handler: this.triggerRun,
 				scope: this
-            }, {
-				text: 'Push',
-				iconCls: 'icoPush',
-				handler: this.triggerPush,
-				scope: this
+            //}, {
+			//	text: 'Push',
+			//	iconCls: 'icoPush',
+			//	handler: this.triggerPush,
+			//	scope: this
 			}]
         });
         

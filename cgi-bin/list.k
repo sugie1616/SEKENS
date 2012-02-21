@@ -95,15 +95,16 @@ void main(String[] args)
 	//OUT.println("	{");
 	//OUT.println("		\"name\": \"teacher\",");
 	//OUT.println("		\"children\": [");
-	outputTree([teacher_tree]);
+	//outputTree([teacher_tree]);
 	//OUT.println("]");
 	//OUT.println("	},{");
-	OUT.println(",{");
-	OUT.println("		\"name\": \"" + username + "\",");
-	OUT.println("		\"children\": [");
+	//OUT.println(",{");
+	//OUT.println("	{");
+	//OUT.println("		\"name\": \"" + username + "\",");
+	//OUT.println("		\"children\": [");
 	outputTree(tree);
-	OUT.println();
-	OUT.println("		]");
-	OUT.println("	}");
+	//OUT.println();
+	//OUT.println("		]");
+	//OUT.println("	}");
 	OUT.println("]");
 }
