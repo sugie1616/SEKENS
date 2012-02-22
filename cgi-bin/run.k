@@ -28,7 +28,7 @@ class Run
 	String evalKonoha() {
 		String script_path = G_USER_DIR + user + "/" + repo + "/" + script;
 		String cmd = "export JS_GEN_HTML=false; export JS_USE_WORKER=true; ";
-		cmd += "/usr/local/bin/konohac --emit-js ";
+        cmd += "export JS_USE_INDENT=true; /usr/local/bin/konohac --emit-js ";
 		String resultcode = exec(cmd + script_path);
 		return resultcode;
 	}
@@ -39,13 +39,13 @@ void main() {
 	Cgi cgi = new Cgi();
 
 	String[] files = [
-		"../jssrc/konoha.js",
-		"../jssrc/konoha.math.js",
-		//"../jssrc/jquery-1.7.1.min.js",
-		"../jssrc/js.js",
-		"../jssrc/js.dom.js",
-		"../jssrc/js.jquery.js",
-		"../jssrc/worker.js"
+		"../js/konoha.js",
+		"../js/konoha.math.js",
+		//"../js/jquery-1.7.1.min.js",
+		"../js/js.js",
+		"../js/js.dom.js",
+		"../js/js.jquery.js",
+		"../js/worker.js"
 	];
 
 	foreach (String file in files) {
