@@ -163,12 +163,25 @@ konoha.Array = function(rawptr) {
 }
 konoha.Array.prototype = new konoha.Object();
 konoha.Array.prototype.konohaclass = "konoha.Array";
-konoha.Array.prototype.new_ARRAY = function(initCapacity) {
-    this.rawptr = new Array(initCapacity);
-    for(var i = 0; i < initCapacity; i++) {
-        this.rawptr[i] = 0;
+konoha.Array.prototype.new_ARRAY = function() {
+    var args = Array.prototype.slice.call(arguments);
+    var initCapacity = args[0];
+    args = args.slice(1);
+    if (args.length == 0) {
+        this.rawptr = new Array(initCapacity);
+        for(var i = 0; i < initCapacity; i++) {
+            this.rawptr[i] = 0;
+        }
+        this.capacity = initCapacity;
     }
-    this.capacity = initCapacity;
+    else {
+        this.rawptr = new Array(initCapacity);
+        for (var i = 0; i < initCapacity; i++) {
+            this.rawptr[i] = new konoha.Array();
+            this.rawptr[i].new_ARRAY.apply(this.rawptr[i], args);
+        }
+        this.capacity = initCapacity;
+    }
     return this;
 }
 
@@ -181,15 +194,57 @@ konoha.Array.prototype.new_LIST = function() {
     return this;
 }
 konoha.Array.prototype.get = function(n) {
-    if (n >= 0 && n < this.capacity) {
+    if (n < this.capacity) {
         return this.rawptr[n];
     } else {
         throw('Script!!');
     }
 }
+konoha.Array.prototype.get2 = function(x, y) {
+    if (x < this.capacity) {
+        return this.rawptr[x].get(y);
+    } else {
+        throw('Script!!');
+    }
+}
+konoha.Array.prototype.get3 = function(x, y, z) {
+    if (x < this.capacity) {
+        return this.rawptr[x].get2(y, z);
+    } else {
+        throw('Script!!');
+    }
+}
+konoha.Array.prototype.get4 = function(x, y, z, w) {
+    if (x < this.capacity) {
+        return this.rawptr[x].get3(y, z, w);
+    } else {
+        throw('Script!!');
+    }
+}
 konoha.Array.prototype.set = function(n, v) {
-    if (n >= 0 && n < this.capacity) {
+    if (n < this.capacity) {
         this.rawptr[n] = v;
+    } else {
+        throw('Script!!');
+    }
+}
+konoha.Array.prototype.set2 = function(x, y, v) {
+    if (x < this.capacity) {
+        this.rawptr[x].set(y, v);
+    } else {
+        throw('Script!!');
+    }
+}
+konoha.Array.prototype.set3 = function(x, y, z, v) {
+    if (x < this.capacity) {
+        this.rawptr[x].set2(y, z, v);
+    } else {
+        throw('Script!!');
+    }
+}
+konoha.Array.prototype.set4 = function(x, y, z, w, v) {
+    if (x < this.capacity) {
+        this.rawptr[x].set3(y, z, w, v);
     } else {
         throw('Script!!');
     }
@@ -244,6 +299,10 @@ konoha.Iterator.prototype.konohaclass = "konoha.Iterator";
 konoha.String = function(rawptr) {
     this.rawptr = rawptr;
 }
+konoha.String.prototype = new konoha.Object();
+konoha.String.prototype.get = function(num) {
+    return new konoha.String(this.rawptr[num]);
+}
 konoha.String.prototype.equals = function(str) {
     return this.rawptr == str.rawptr;
 }
@@ -297,7 +356,6 @@ konoha.String.prototype.getSize = function() {
     return this.rawptr.length;
 }
 
-konoha.String.prototype = new konoha.Object();
 konoha.String.prototype.konohaclass = "konoha.String";
 
 /* Regex */
@@ -325,8 +383,8 @@ konoha.Int = function(rawptr) {
 konoha.Int.prototype = new konoha.Number();
 konoha.Int.prototype.konohaclass = "konoha.Int";
 
-konoha.Int.random = function() {
-    return Math.random();
+konoha.Int.random = function(arg) {
+    return Math.floor(Math.random() * arg);
 }
 konoha.Int.format = function(i, format) {
     switch (format.rawptr) {
