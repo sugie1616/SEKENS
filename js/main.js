@@ -99,6 +99,7 @@ Ext.onReady(function() {
 		var canvas;
 		var ctx;
 		var curidx = 0;
+		var stream = true;
 		worker.onmessage = function(e) {
 			var json = Ext.JSON.decode(e.data);
 			switch (json.event) {
@@ -130,10 +131,15 @@ Ext.onReady(function() {
 			//	ctx2.fillStyle = json.fillStyle;
 			//	break;
 			case 'fillRect':
-				for (var i = 0; i < json.rect.length; i++) {
-					var rect = json.rect[i];
-					ctx.fillStyle = rect._style.rawptr;
-					ctx.fillRect(rect._x, rect._y, rect._w, rect._h);
+				if (stream) {
+					ctx.fillStyle = json.fillStyle;
+					ctx.fillRect(json.x, json.y, json.w, json.h);
+				} else {
+					for (var i = 0; i < json.rect.length; i++) {
+						var rect = json.rect[i];
+						ctx.fillStyle = rect._style.rawptr;
+						ctx.fillRect(rect._x, rect._y, rect._w, rect._h);
+					}
 				}
 				break;
 			case 'appendChild':

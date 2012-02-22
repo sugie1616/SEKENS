@@ -164,23 +164,26 @@ js.dom.Element = function(rawptr) {
 			this._rect = [];
 			this._fillstyle = null;
 			this._count = 0;
+			this._stream = true;
 			this.fillRect = function(x, y, w, h) {
-				//postMessage(JSON.stringify({
-				//	'event': 'fillRect',
-				//	'fillStyle': this._fillstyle.rawptr,
-				//	'x': x,
-				//	'y': y,
-				//	'w': w,
-				//	'h': h
-				//}));
-				this._rect.push(new rect(x, y, w, h, this._fillstyle));
-				if (this._rect.length > 10000) {
+				if (this._stream) {
 					postMessage(JSON.stringify({
 						'event': 'fillRect',
-						'rect': this._rect
-						//'document': document
+						'fillStyle': this._fillstyle.rawptr,
+						'x': x,
+						'y': y,
+						'w': w,
+						'h': h
 					}));
-					this._rect = [];
+				} else {
+					this._rect.push(new rect(x, y, w, h, this._fillstyle));
+					if (this._rect.length > 10000) {
+						postMessage(JSON.stringify({
+							'event': 'fillRect',
+							'rect': this._rect
+						}));
+						this._rect = [];
+					}
 				}
 			};
 			this.setFillStyle = function(sty) {
