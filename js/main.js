@@ -347,7 +347,14 @@ Ext.onReady(function() {
 			},
 			success: function(result) {
 				var json = Ext.JSON.decode(result.responseText);
-				if (success_func != null) {
+				if (json['error'] != null) {
+					Ext.MessageBox.show({
+						title: 'Error',
+						msg: 'An error occurred!',
+						icon: Ext.MessageBox.ERROR,
+						buttons: Ext.MessageBox.OK
+					});
+				} else if (success_func != null && json['script'] != null) {
 					success_func(json['script'].trim());
 				}
 			},
