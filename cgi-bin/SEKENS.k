@@ -17,50 +17,19 @@ class SEKENS
 			<title>SEKENS</title>
 			<!-- sekens style sheet -->
 			<link rel="stylesheet" type="text/css" href="../css/sekens.css" />
-			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/resources/css/ext-all.css"/>
-			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/examples/shared/example.css"/>
-			<link rel="stylesheet" type="text/css" href="../resources/peers.css"/>
-			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/examples/ux/DataView/DragSelector.css" />
-			<script type="text/javascript" src="../ext-4.0.7/bootstrap.js"></script>
-			<script type="text/javascript" src="../ext-4.0.7/Ext.ux.panel.CodeMirror.js"></script>
+			<link rel="stylesheet" type="text/css" href="../libs/ext-4.0.7/resources/css/ext-all.css"/>
+			<script type="text/javascript" src="../libs/ext-4.0.7/ext-all-debug.js"></script>
+			<script type="text/javascript" src="../libs/ext-4.0.7/Ext.ux.panel.CodeMirror.js"></script>
 			<!-- Loading CodeMirror Template files -->
-			<script type="text/javascript" src="../ext-4.0.7/CodeMirror-2.0/lib/codemirror.js"></script>
+			<script type="text/javascript" src="../libs/CodeMirror-2.0/lib/codemirror.js"></script>
 			<!-- konoha.compiler.js -->
-			<!--<script type="text/javascript" src="../jssrc/konoha.js"></script>-->
+			<!--<script type="text/javascript" src="../js/konoha.js"></script>-->
 			%jscode%
-			<script type="text/javascript" src="../jssrc/%script%"></script>
-			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/CodeMirror-2.0/lib/codemirror.css" />
+			<script type="text/javascript" src="../js/%script%"></script>
+			<link rel="stylesheet" type="text/css" href="../libs/CodeMirror-2.0/lib/codemirror.css" />
 			<!-- CodeMirror javascript mode -->
-			<script http-equiv="content-script-type" content="text/javascript" src="../ext-4.0.7/CodeMirror-2.0/mode/javascript/javascript.js"></script>
-			<link rel="stylesheet" type="text/css" href="../ext-4.0.7/CodeMirror-2.0/mode/javascript/javascript.css" />
-			<!-- Common Styles for the examples -->
-			<style type="text/css">
-			.x-panel-body p {
-				margin:10px;
-			}
-			.container {
-				padding:10px;
-			}
-			em.cfg { font-style: italic; font-weight: bold;}
-			.CodeMirror-line-numbers {
-				width: 2.2em;
-				color: #aaa;
-				background-color: #eee;
-				text-align: right;
-				margin: 0;
-				padding: 0.4em;
-				font-family: monospace;
-				font-size: 10pt;
-			}
-			</style>
-			<style type="text/css">
-				.task {
-					background-image: url(http://localhost/SEKENS/ext-4.0.7/examples/shared/icons/fam/cog.gif) !important;
-				}
-				.task-folder {
-					background-image: url(http://localhost/SEKENS/ext-4.0.7/examples/shared/icons/fam/folder_go.gif) !important;
-				}
-			</style>
+			<script http-equiv="content-script-type" content="text/javascript" src="../libs/CodeMirror-2.0/mode/javascript/javascript.js"></script>
+			<link rel="stylesheet" type="text/css" href="../libs/CodeMirror-2.0/mode/javascript/javascript.css" />
 		</head>
 		<body>
 		</body>
