@@ -336,7 +336,7 @@ Ext.onReady(function() {
 			icon: 'konoha-running'
 		});
 	};
-	var loadScript = function(title, name, type, success) {
+	var loadScript = function(title, name, type, success_func) {
 		Ext.Ajax.request({
 			method: 'GET',
 			url: homeURL + 'cgi-bin/load.k',
@@ -347,8 +347,8 @@ Ext.onReady(function() {
 			},
 			success: function(result) {
 				var json = Ext.JSON.decode(result.responseText);
-				if (success != null) {
-					success(json['script'].trim());
+				if (success_func != null) {
+					success_func(json['script'].trim());
 				}
 			},
 			failure: function() {
