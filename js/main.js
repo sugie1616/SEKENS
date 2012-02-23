@@ -66,6 +66,7 @@ Ext.onReady(function() {
 	};
 	//var canvasWindow;
 	var canvasWindow;
+	var dumpWindow;
 	//var showCanvas = function(kctx, width, height) {
 	//	canvasWindow = Ext.create('widget.window', {
 	//			title: 'Canvas',
@@ -88,10 +89,29 @@ Ext.onReady(function() {
 	//		ctx.fillRect(rect._x, rect._y, rect._w, rect._h);
 	//	}
 	//};
+	var showValues = function(values) {
+		var vlist = [];
+		for (var v in values) {
+			vlist.push({
+				tag: 'li',
+				id: v,
+				html: v + '=' + values[v]
+			});
+		}
+		Ext.DomHelper.overwrite('dumpfield', {
+			tag: 'ul',
+			id: 'dumpul',
+			children: vlist
+		});
+	};
 	var runKonoha = function(title, name) {
 		if (canvasWindow != null) {
 			canvasWindow.destroy();
 			canvasWindow = null;
+		}
+		if (dumpWindow != null) {
+			dumpWindow.destroy();
+			dumpWindow = null;
 		}
 		Ext.DomHelper.overwrite('console-out', {tag: 'div'});
 		Ext.DomHelper.overwrite('console-err', {tag: 'div'});
@@ -100,6 +120,7 @@ Ext.onReady(function() {
 		var ctx;
 		var curidx = 0;
 		var stream = true;
+		var debugdump = true;
 		worker.onmessage = function(e) {
 			var json = Ext.JSON.decode(e.data);
 			switch (json.event) {
@@ -130,6 +151,10 @@ Ext.onReady(function() {
 			//case 'setFillStyle':
 			//	ctx2.fillStyle = json.fillStyle;
 			//	break;
+			case 'safepoint':
+				//console.log(json.values);
+				showValues(json.values);
+				break;
 			case 'fillStyle':
 				ctx.fillStyle = json.fillStyle;
 				break;
@@ -368,6 +393,15 @@ Ext.onReady(function() {
 		worker.postMessage(JSON.stringify({
 			type: 'start'
 		}));
+		if (debugdump == true) {
+			dumpWindow = Ext.create('widget.window', {
+				title: 'Values',
+				width: 200,
+				height: 400,
+				html: '<div id="dumpfield"></div>'
+			});
+			dumpWindow.show();
+		}
 		Ext.MessageBox.show({
 			msg: 'Running konoha, please wait...',
 			progressText: 'Running...',
