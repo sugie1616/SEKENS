@@ -186,6 +186,23 @@ js.dom.Element = function(rawptr) {
 					}
 				}
 			};
+			this.arc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
+				postMessage(JSON.stringify({
+					'event': 'arc',
+					'x': x,
+					'y': y,
+					'radius': radius,
+					'startAngle': startAngle,
+					'endAngle': endAngle,
+					'anticlockwise': anticlockwise
+				}));
+			};
+			this.fill = function() {
+				postMessage(JSON.stringify({
+					'event': 'fill',
+					'fillStyle': this._fillstyle.rawptr
+				}));
+			};
 			this.setFillStyle = function(sty) {
 				//postMessage(JSON.stringify({
 				//	'event': 'setFillStyle',

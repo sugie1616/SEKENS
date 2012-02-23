@@ -142,6 +142,13 @@ Ext.onReady(function() {
 					}
 				}
 				break;
+			case 'arc':
+				ctx.arc(json.x, json.y, json.radius, json.startAngle, json.endAngle, json.anticlockwise);
+				break;
+			case 'fill':
+				ctx.fillStyle = json.fillStyle;
+				ctx.fill();
+				break;
 			case 'appendChild':
 				if (canvasWindow == null && json.child.nodeName == "Canvas") {
 					for (var j = 0; j < json.child._attributes.length; j++) {
