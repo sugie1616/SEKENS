@@ -186,6 +186,38 @@ js.dom.Element = function(rawptr) {
 					}
 				}
 			};
+			this.strokeText = function(text, x, y) {
+				postMessage(JSON.stringify({
+					'event': 'strokeText',
+					'strokeStyle': this._strokestyle.rawptr,
+					'text': text.rawptr,
+					'x': x,
+					'y': y
+				}));
+			};
+			this.fillText = function(text, x, y) {
+				postMessage(JSON.stringify({
+					'event': 'fillText',
+					'fillStyle': this._fillstyle.rawptr,
+					'text': text,
+					'x': x,
+					'y': y
+				}));
+			};
+			this.moveTo = function(x, y) {
+				postMessage(JSON.stringify({
+					'event': 'moveTo',
+					'x': x,
+					'y': y
+				}));
+			};
+			this.lineTo = function(x, y) {
+				postMessage(JSON.stringify({
+					'event': 'lineTo',
+					'x': x,
+					'y': y
+				}));
+			};
 			this.arc = function(x, y, radius, startAngle, endAngle, anticlockwise) {
 				postMessage(JSON.stringify({
 					'event': 'arc',
@@ -197,6 +229,17 @@ js.dom.Element = function(rawptr) {
 					'anticlockwise': anticlockwise
 				}));
 			};
+			this.beginPath = function() {
+				postMessage(JSON.stringify({
+					'event': 'beginPath',
+				}));
+			};
+			this.stroke = function() {
+				postMessage(JSON.stringify({
+					'event': 'stroke',
+					'strokeStyle': this._strokestyle.rawptr
+				}));
+			};
 			this.fill = function() {
 				postMessage(JSON.stringify({
 					'event': 'fill',
@@ -204,11 +247,22 @@ js.dom.Element = function(rawptr) {
 				}));
 			};
 			this.setFillStyle = function(sty) {
-				//postMessage(JSON.stringify({
-				//	'event': 'setFillStyle',
-				//	'fillStyle': sty.rawptr
-				//}));
+				if (this._stream) {
+					postMessage(JSON.stringify({
+						'event': 'fillStyle',
+						'fillStyle': sty.rawptr
+					}));
+				}
 				this._fillstyle = sty;
+			};
+			this.setStrokeStyle = function(sty) {
+				if (this._stream) {
+					postMessage(JSON.stringify({
+						'event': 'strokeStyle',
+						'strokeStyle': sty.rawptr
+					}));
+				}
+				this._strokestyle = sty;
 			};
 		}
 	};
@@ -333,7 +387,7 @@ js.dom.Context = function(rawptr) {
     this.strokeRect = function(x, y, w, h) {
         this.rawptr.strokeRect(x, y, w, h);
     }
-    this.stroketext = function(text, x, y) {
+    this.strokeText = function(text, x, y) {
         this.rawptr.strokeText(text.rawptr, x, y);
     }
     this.translate = function(x, y) {

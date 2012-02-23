@@ -130,6 +130,12 @@ Ext.onReady(function() {
 			//case 'setFillStyle':
 			//	ctx2.fillStyle = json.fillStyle;
 			//	break;
+			case 'fillStyle':
+				ctx.fillStyle = json.fillStyle;
+				break;
+			case 'strokeStyle':
+				ctx.strokeStyle = json.strokeStyle;
+				break;
 			case 'fillRect':
 				if (stream) {
 					ctx.fillStyle = json.fillStyle;
@@ -142,11 +148,34 @@ Ext.onReady(function() {
 					}
 				}
 				break;
+			case 'strokeText':
+				ctx.strokeStyle = json.strokeStyle;
+				ctx.strokeText(json.text, json.x, json.y);
+				break;
+			case 'fillText':
+				ctx.fillStyle = json.fillStyle;
+				ctx.fillText(json.text, json.x, json.y);
+				break;
+			case 'moveTo':
+				ctx.moveTo(json.x, json.y);
+				break;
+			case 'lineTo':
+				ctx.lineTo(json.x, json.y);
+				break;
 			case 'arc':
 				ctx.arc(json.x, json.y, json.radius, json.startAngle, json.endAngle, json.anticlockwise);
 				break;
+			case 'beginPath':
+				//ctx.fillStyle = json.fillStyle;
+				ctx.beginPath();
+				break;
+			case 'stroke':
+				ctx.strokeStyle = json.strokeStyle;
+				ctx.stroke();
+				break;
+
 			case 'fill':
-				ctx.fillStyle = json.fillStyle;
+				//ctx.fillStyle = json.fillStyle;
 				ctx.fill();
 				break;
 			case 'appendChild':
