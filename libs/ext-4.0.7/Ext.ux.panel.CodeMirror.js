@@ -112,11 +112,16 @@ Ext.define('Ext.ux.panel.CodeMirror', {
 				iconCls: 'icoRun',
 				handler: this.triggerRun,
 				scope: this
+//            }, {
+//				text: 'Push',
+//				iconCls: 'icoPush',
+//				handler: this.triggerPush,
+//				scope: this
             }, {
-				text: 'Push',
-				iconCls: 'icoPush',
-				handler: this.triggerPush,
-				scope: this
+                text: 'Debug',
+                iconCls: 'iconDebug',
+                handler: this.triggerDebug,
+                scope: this
 			}]
         });
         
@@ -127,9 +132,13 @@ Ext.define('Ext.ux.panel.CodeMirror', {
 		this.Run(arguments[0] || false);
 	},
 
-	triggerPush: function() {
-		this.Push(arguments[0] || false);
-	},
+//	triggerPush: function() {
+//		this.Push(arguments[0] || false);
+//	},
+
+    triggerDebug: function() {
+        this.Debug(arguments[0] || false);
+    },
 
     triggerOnSave: function() {
         this.setTitleClass(true);

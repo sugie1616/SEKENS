@@ -65,6 +65,7 @@ Ext.onReady(function() {
 		return json;
 	};
 	//var canvasWindow;
+	var rundebug = false;
 	var canvasWindow;
 	var dumpWindow;
 	//var showCanvas = function(kctx, width, height) {
@@ -90,19 +91,21 @@ Ext.onReady(function() {
 	//	}
 	//};
 	var showValues = function(values) {
-		var vlist = [];
 		for (var v in values) {
-			vlist.push({
-				tag: 'li',
-				id: v,
-				html: v + '=' + values[v]
-			});
+			if (Ext.getDom(v) != null) {
+				Ext.DomHelper.overwrite(v, {
+					tag: 'li',
+					id: v,
+					html: v + '=' + values[v]
+				});
+			} else {
+				Ext.DomHelper.append('dumpul', {
+					tag: 'li',
+					id: v,
+					html: v + '=' + values[v]
+				});
+			}
 		}
-		Ext.DomHelper.overwrite('dumpfield', {
-			tag: 'ul',
-			id: 'dumpul',
-			children: vlist
-		});
 	};
 	var runKonoha = function(title, name) {
 		if (canvasWindow != null) {
@@ -115,12 +118,15 @@ Ext.onReady(function() {
 		}
 		Ext.DomHelper.overwrite('console-out', {tag: 'div'});
 		Ext.DomHelper.overwrite('console-err', {tag: 'div'});
-		var worker = new Worker(homeURL + 'cgi-bin/run.k?title=' + title + '&name=' + name);
+		var workurl = homeURL + 'cgi-bin/run.k?title=' + title + '&name=' + name;
+		if (rundebug) {
+			workurl += '&debug=true';
+		}
+		var worker = new Worker(workurl);
 		var canvas;
 		var ctx;
 		var curidx = 0;
 		var stream = true;
-		var debugdump = true;
 		worker.onmessage = function(e) {
 			var json = Ext.JSON.decode(e.data);
 			switch (json.event) {
@@ -393,12 +399,12 @@ Ext.onReady(function() {
 		worker.postMessage(JSON.stringify({
 			type: 'start'
 		}));
-		if (debugdump == true) {
+		if (rundebug == true) {
 			dumpWindow = Ext.create('widget.window', {
 				title: 'Values',
 				width: 200,
 				height: 400,
-				html: '<div id="dumpfield"></div>'
+				html: '<ul id="dumpul"></ul>'
 			});
 			dumpWindow.show();
 		}
@@ -478,6 +484,40 @@ Ext.onReady(function() {
 		region: 'center'
 	});
 
+	var pushRun = function() {
+		loadScript(data.repo, data.name, 'answer', function(script) {
+			var current = editorPanel.getChildByElement('ktextarea').codeMirrorEditor.getValue();
+			if (script == current.trim()) {
+				storeScript(data.repo, data.name, current);
+				saveScript(data.repo, data.name, current, function() {
+					runKonoha(data.repo, data.name);
+				});
+			} else {
+				Ext.MessageBox.show({
+						msg: "'" + data.repo + "/" + data.name + "' has been modified. Save changes?",
+						buttons: Ext.MessageBox.YESNOCANCEL,
+						fn: function(btn) {
+							switch (btn) {
+							case 'yes':
+								saveScript(data.repo, data.name, current, function(result) {
+									runKonoha(data.repo, data.name);
+								});
+								break;
+							case 'no':
+								saveScript('Repository', 'notitle.k', current, function(result) {
+									runKonoha('Repository', 'notitle.k');
+								});
+								break;
+							case 'cancel':
+								break;
+							}
+						},
+						icon: Ext.MessageBox.QUESTION
+				});
+			}
+		});
+	};
+
 	editorPanel.addListener('resize', function(component, eOpts) {
 		editorPanel.add({
 				resizable: true,
@@ -492,37 +532,12 @@ Ext.onReady(function() {
 					storeScript(editorPanel.title, this.title, this.codeMirrorEditor.getValue());
 				},
 				Run: function() {
-					loadScript(data.repo, data.name, 'answer', function(script) {
-						var current = editorPanel.getChildByElement('ktextarea').codeMirrorEditor.getValue();
-						if (script == current.trim()) {
-							storeScript(data.repo, data.name, current);
-							saveScript(data.repo, data.name, current, function() {
-								runKonoha(data.repo, data.name);
-							});
-						} else {
-							Ext.MessageBox.show({
-									msg: "'" + data.repo + "/" + data.name + "' has been modified. Save changes?",
-									buttons: Ext.MessageBox.YESNOCANCEL,
-									fn: function(btn) {
-										switch (btn) {
-										case 'yes':
-											saveScript(data.repo, data.name, current, function(result) {
-												runKonoha(data.repo, data.name);
-											});
-											break;
-										case 'no':
-											saveScript('Repository', 'notitle.k', current, function(result) {
-												runKonoha('Repository', 'notitle.k');
-											});
-											break;
-										case 'cancel':
-											break;
-										}
-									},
-									icon: Ext.MessageBox.QUESTION
-							});
-						}
-					});
+					rundebug = false;
+					pushRun();
+				},
+				Debug: function() {
+					rundebug = true;
+					pushRun();
 				},
 				Push: function() {
 					todo();
