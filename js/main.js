@@ -29,6 +29,60 @@ Ext.apply(Ext.form.field.VTypes, {
 var editorPanel;
 var documentJson;
 
+var createObjectURL = window.URL && window.URL.createObjectURL
+? function (file) { return window.URL.createObjectURL (file); }
+: window.webkitURL && window.webkitURL.createObjectURL
+? function (file) { return window.webkitURL.createObjectURL (file); }
+: undefined;
+
+function errorHandler() {
+	console.log('error!');
+}
+
+function readState(read_callback) {
+	window.requestFileSystem(window.TEMPORARY, 4/* 4b */, function(fs) {
+		fs.root.getFile('state.txt', {create: true, exclusive: false}, function(entry) {
+			/* read */
+			entry.file(function(file) {
+				var reader = new FileReader();
+				reader.onloadend = function(e) {
+					read_callback = read_callback || function(r) {};
+					read_callback(this.result);
+					//console.log(this.result);
+				}
+				reader.readAsText(file);
+			}, errorHandler);
+		}, errorHandler);
+	}, errorHandler);
+}
+
+function writeState(state, callback) {
+	callback = callback || function(e) {};
+	window.requestFileSystem(window.TEMPORARY, 4/* 4b */, function(fs) {
+		fs.root.getFile('state.txt', {create: true, exclusive: false}, function(entry) {
+			/* write */
+			entry.createWriter(function(writer) {
+				//writer.onwriteend = function(e) {
+				//	console.log('write success');
+				//};
+
+				entry.file(function (f) {
+					var u = webkitURL || URL;
+					callback(u.createObjectURL(f));
+				});
+
+				var bb = new BlobBuilder();
+				bb.append(state);
+				writer.write(bb.getBlob('text/plain'));
+			}, errorHandler);
+		}, errorHandler);
+	}, errorHandler);
+}
+
+window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
+
+window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+
 Ext.onReady(function() {
 	Ext.tip.QuickTipManager.init();
 	var todo = function() {
@@ -65,40 +119,73 @@ Ext.onReady(function() {
 		return json;
 	};
 	//var canvasWindow;
+	var rundebug = false;
 	var canvasWindow;
+	var dumpWindow;
+	var runningWindow;
 	//var showCanvas = function(kctx, width, height) {
-	//	canvasWindow = Ext.create('widget.window', {
-	//			title: 'Canvas',
-	//			width: width + 12,
-	//			height: height + 35,
-	//			html: '<div id="canvas-body"></div>'
-	//	});
-	//	canvasWindow.show();
-	//	Ext.DomHelper.append('canvas-body', {
-	//		id: 'konoha-canvas',
-	//		tag: 'canvas',
-	//		width: width,
-	//		height: height
-	//	});
-	//	var canvas = Ext.getDom('konoha-canvas');
-	//	var ctx = canvas.getContext('2d');
-	//	for (var i = 0; i < kctx['2d'][0]._rect.length; i++) {
-	//		var rect = kctx['2d'][0]._rect[i];
-	//		ctx.fillStyle = rect._style.rawptr;
-	//		ctx.fillRect(rect._x, rect._y, rect._w, rect._h);
-	//	}
+	//      canvasWindow = Ext.create('widget.window', {
+	//                      title: 'Canvas',
+	//                      width: width + 12,
+	//                      height: height + 35,
+	//                      html: '<div id="canvas-body"></div>'
+	//      });
+	//      canvasWindow.show();
+	//      Ext.DomHelper.append('canvas-body', {
+	//              id: 'konoha-canvas',
+	//              tag: 'canvas',
+	//              width: width,
+	//              height: height
+	//      });
+	//      var canvas = Ext.getDom('konoha-canvas');
+	//      var ctx = canvas.getContext('2d');
+	//      for (var i = 0; i < kctx['2d'][0]._rect.length; i++) {
+	//              var rect = kctx['2d'][0]._rect[i];
+	//              ctx.fillStyle = rect._style.rawptr;
+	//              ctx.fillRect(rect._x, rect._y, rect._w, rect._h);
+	//      }
 	//};
+	var showValues = function(values) {
+		for (var v in values) {
+			if (Ext.getDom(v) != null) {
+				Ext.DomHelper.overwrite(v, {
+					tag: 'li',
+					id: v,
+					html: v + '=' + values[v]
+				});
+			} else {
+				Ext.DomHelper.append('dumpul', {
+					tag: 'li',
+					id: v,
+					html: v + '=' + values[v]
+				});
+			}
+		}
+	};
 	var runKonoha = function(title, name) {
 		if (canvasWindow != null) {
 			canvasWindow.destroy();
 			canvasWindow = null;
 		}
+		if (dumpWindow != null) {
+			dumpWindow.destroy();
+			dumpWindow = null;
+		}
+		if (runningWindow != null) {
+			runningWindow.destroy();
+			runningWindow = null;
+		}
 		Ext.DomHelper.overwrite('console-out', {tag: 'div'});
 		Ext.DomHelper.overwrite('console-err', {tag: 'div'});
-		var worker = new Worker(homeURL + 'cgi-bin/run.k?title=' + title + '&name=' + name);
+		var workurl = homeURL + 'cgi-bin/run.k?title=' + title + '&name=' + name;
+		if (rundebug) {
+			workurl += '&debug=true';
+		}
+		var worker = new Worker(workurl);
 		var canvas;
 		var ctx;
 		var curidx = 0;
+		var stream = true;
 		worker.onmessage = function(e) {
 			var json = Ext.JSON.decode(e.data);
 			switch (json.event) {
@@ -129,12 +216,57 @@ Ext.onReady(function() {
 			//case 'setFillStyle':
 			//	ctx2.fillStyle = json.fillStyle;
 			//	break;
+			case 'safepoint':
+				//console.log(json.values);
+				showValues(json.values);
+				break;
+			case 'fillStyle':
+				ctx.fillStyle = json.fillStyle;
+				break;
+			case 'strokeStyle':
+				ctx.strokeStyle = json.strokeStyle;
+				break;
 			case 'fillRect':
-				for (var i = 0; i < json.rect.length; i++) {
-					var rect = json.rect[i];
-					ctx.fillStyle = rect._style.rawptr;
-					ctx.fillRect(rect._x, rect._y, rect._w, rect._h);
+				if (stream) {
+					ctx.fillStyle = json.fillStyle;
+					ctx.fillRect(json.x, json.y, json.w, json.h);
+				} else {
+					for (var i = 0; i < json.rect.length; i++) {
+						var rect = json.rect[i];
+						ctx.fillStyle = rect._style.rawptr;
+						ctx.fillRect(rect._x, rect._y, rect._w, rect._h);
+					}
 				}
+				break;
+			case 'strokeText':
+				ctx.strokeStyle = json.strokeStyle;
+				ctx.strokeText(json.text, json.x, json.y);
+				break;
+			case 'fillText':
+				ctx.fillStyle = json.fillStyle;
+				ctx.fillText(json.text, json.x, json.y);
+				break;
+			case 'moveTo':
+				ctx.moveTo(json.x, json.y);
+				break;
+			case 'lineTo':
+				ctx.lineTo(json.x, json.y);
+				break;
+			case 'arc':
+				ctx.arc(json.x, json.y, json.radius, json.startAngle, json.endAngle, json.anticlockwise);
+				break;
+			case 'beginPath':
+				//ctx.fillStyle = json.fillStyle;
+				ctx.beginPath();
+				break;
+			case 'stroke':
+				ctx.strokeStyle = json.strokeStyle;
+				ctx.stroke();
+				break;
+
+			case 'fill':
+				//ctx.fillStyle = json.fillStyle;
+				ctx.fill();
 				break;
 			case 'appendChild':
 				if (canvasWindow == null && json.child.nodeName == "Canvas") {
@@ -172,7 +304,7 @@ Ext.onReady(function() {
 					}
 				}
 				documentJson = json;
-				Ext.MessageBox.hide();
+				runningWindow.hide();
 			case 'progress':
 				//if (json['document']['_context']['2d'].length > 0) {
 				//	var body = json['document']._elems.body._elems[0];
@@ -312,10 +444,10 @@ Ext.onReady(function() {
 		worker.onerror = function(e) {
 			Ext.MessageBox.hide();
 			Ext.MessageBox.show({
-					title: 'Error',
-					msg: 'An error occurred!',
-					icon: Ext.MessageBox.ERROR,
-					buttons: Ext.MessageBox.OK
+				title: 'Error',
+				msg: 'An error occurred!',
+				icon: Ext.MessageBox.ERROR,
+				buttons: Ext.MessageBox.OK
 			});
 		};
 		//worker.postMessage(JSON.stringify({
@@ -323,18 +455,53 @@ Ext.onReady(function() {
 		//	async: true,
 		//	interval: 1000
 		//}));
-		worker.postMessage(JSON.stringify({
-			type: 'start'
-		}));
-		Ext.MessageBox.show({
-			msg: 'Running konoha, please wait...',
-			progressText: 'Running...',
-			buttons: Ext.MessageBox.CANCEL,
-			fn: function(btn) {
-				worker.terminate();
-			},
-			icon: 'konoha-running'
+		writeState('runn', function(fileURL) {
+			worker.postMessage(JSON.stringify({
+				type: 'start',
+				url: fileURL
+			}));
 		});
+		if (rundebug == true) {
+			dumpWindow = Ext.create('widget.window', {
+				title: 'Values',
+				width: 214,
+				height: 400,
+				layout: 'fit',
+				html: '<ul id="dumpul"></ul>'
+			});
+			dumpWindow.show();
+		}
+		runningWindow = Ext.create('widget.window', {
+			title: 'Running konoha, please wait...',
+			width: 300,
+			height: 100,
+			buttons: [{
+				text: 'Stop',
+				id: 'stop-btn',
+				handler: function() {
+					writeState('stop');
+					this.nextNode().setDisabled(false);
+					this.setDisabled(true);
+				}
+			}, {
+				text: 'Continue',
+				id: 'cont-btn',
+				disabled: true,
+				handler: function() {
+					writeState('runn');
+					this.previousNode().setDisabled(false);
+					this.setDisabled(true);
+				}
+			}, {
+				text: 'Terminate',
+				id: 'term-btn',
+				handler: function() {
+					worker.terminate();
+					runningWindow.hide();
+				}
+			}]
+		});
+		runningWindow.show();
 	};
 	var loadScript = function(title, name, type, success_func) {
 		Ext.Ajax.request({
@@ -347,7 +514,14 @@ Ext.onReady(function() {
 			},
 			success: function(result) {
 				var json = Ext.JSON.decode(result.responseText);
-				if (success_func != null) {
+				if (json['error'] != null) {
+					Ext.MessageBox.show({
+						title: 'Error',
+						msg: 'An error occurred!',
+						icon: Ext.MessageBox.ERROR,
+						buttons: Ext.MessageBox.OK
+					});
+				} else if (success_func != null && json['script'] != null) {
 					success_func(json['script'].trim());
 				}
 			},
@@ -395,6 +569,40 @@ Ext.onReady(function() {
 		region: 'center'
 	});
 
+	var pushRun = function() {
+		loadScript(data.repo, data.name, 'answer', function(script) {
+			var current = editorPanel.getChildByElement('ktextarea').codeMirrorEditor.getValue();
+			if (script == current.trim()) {
+				storeScript(data.repo, data.name, current);
+				saveScript(data.repo, data.name, current, function() {
+					runKonoha(data.repo, data.name);
+				});
+			} else {
+				Ext.MessageBox.show({
+						msg: "'" + data.repo + "/" + data.name + "' has been modified. Save changes?",
+						buttons: Ext.MessageBox.YESNOCANCEL,
+						fn: function(btn) {
+							switch (btn) {
+							case 'yes':
+								saveScript(data.repo, data.name, current, function(result) {
+									runKonoha(data.repo, data.name);
+								});
+								break;
+							case 'no':
+								saveScript('Repository', 'notitle.k', current, function(result) {
+									runKonoha('Repository', 'notitle.k');
+								});
+								break;
+							case 'cancel':
+								break;
+							}
+						},
+						icon: Ext.MessageBox.QUESTION
+				});
+			}
+		});
+	};
+
 	editorPanel.addListener('resize', function(component, eOpts) {
 		editorPanel.add({
 				resizable: true,
@@ -409,37 +617,12 @@ Ext.onReady(function() {
 					storeScript(editorPanel.title, this.title, this.codeMirrorEditor.getValue());
 				},
 				Run: function() {
-					loadScript(data.repo, data.name, 'answer', function(script) {
-						var current = editorPanel.getChildByElement('ktextarea').codeMirrorEditor.getValue();
-						if (script == current.trim()) {
-							storeScript(data.repo, data.name, current);
-							saveScript(data.repo, data.name, current, function() {
-								runKonoha(data.repo, data.name);
-							});
-						} else {
-							Ext.MessageBox.show({
-									msg: "'" + data.repo + "/" + data.name + "' has been modified. Save changes?",
-									buttons: Ext.MessageBox.YESNOCANCEL,
-									fn: function(btn) {
-										switch (btn) {
-										case 'yes':
-											saveScript(data.repo, data.name, current, function(result) {
-												runKonoha(data.repo, data.name);
-											});
-											break;
-										case 'no':
-											saveScript('Repository', 'notitle.k', current, function(result) {
-												runKonoha('Repository', 'notitle.k');
-											});
-											break;
-										case 'cancel':
-											break;
-										}
-									},
-									icon: Ext.MessageBox.QUESTION
-							});
-						}
-					});
+					rundebug = false;
+					pushRun();
+				},
+				Debug: function() {
+					rundebug = true;
+					pushRun();
 				},
 				Push: function() {
 					todo();

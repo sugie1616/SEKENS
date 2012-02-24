@@ -7,6 +7,7 @@
  * @param cookie['SID']		sid
  * @param title				title of repository
  * @param name				script name
+ * @param debug				set true if using debug mode
  * @return json['result']	result message
  * @return json['error']	error message
  */
@@ -25,10 +26,14 @@ class Run
 		_script = scriptname;
 	}
 	
-	String evalKonoha() {
+	String evalKonoha(boolean debug) {
 		String script_path = G_USER_DIR + user + "/" + repo + "/" + script;
 		String cmd = "export JS_GEN_HTML=false; export JS_USE_WORKER=true; ";
-        cmd += "export JS_USE_INDENT=true; /usr/local/bin/konohac --emit-js ";
+		cmd += "export JS_USE_INDENT=true; ";
+		if (debug) {
+			cmd += "export JS_USE_VALUEDUMP=true; ";
+		}
+		cmd += "/usr/local/bin/konohac --emit-js ";
 		String resultcode = exec(cmd + script_path);
 		return resultcode;
 	}
@@ -69,6 +74,8 @@ void main() {
 		return;
 	}
 
+	boolean debug = (cgi.params["debug"] == "true" ? true : false);
+
 	String sid = cgi.cookies["SID"]["val"];
 	Json j = SEKENS.checkSID(sid);
 	if (j == null) {
@@ -78,5 +85,5 @@ void main() {
 	String username = j["username"];
 
 	Run run = new Run(username, repo_title, script_name);
-	OUT << run.evalKonoha() << EOL;
+	OUT << run.evalKonoha(debug) << EOL;
 }
