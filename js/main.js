@@ -122,6 +122,7 @@ Ext.onReady(function() {
 	var rundebug = false;
 	var canvasWindow;
 	var dumpWindow;
+	var runningWindow;
 	//var showCanvas = function(kctx, width, height) {
 	//      canvasWindow = Ext.create('widget.window', {
 	//                      title: 'Canvas',
@@ -169,6 +170,10 @@ Ext.onReady(function() {
 		if (dumpWindow != null) {
 			dumpWindow.destroy();
 			dumpWindow = null;
+		}
+		if (runningWindow != null) {
+			runningWindow.destroy();
+			runningWindow = null;
 		}
 		Ext.DomHelper.overwrite('console-out', {tag: 'div'});
 		Ext.DomHelper.overwrite('console-err', {tag: 'div'});
@@ -299,7 +304,7 @@ Ext.onReady(function() {
 					}
 				}
 				documentJson = json;
-				Ext.MessageBox.hide();
+				runningWindow.hide();
 			case 'progress':
 				//if (json['document']['_context']['2d'].length > 0) {
 				//	var body = json['document']._elems.body._elems[0];
@@ -439,10 +444,10 @@ Ext.onReady(function() {
 		worker.onerror = function(e) {
 			Ext.MessageBox.hide();
 			Ext.MessageBox.show({
-					title: 'Error',
-					msg: 'An error occurred!',
-					icon: Ext.MessageBox.ERROR,
-					buttons: Ext.MessageBox.OK
+				title: 'Error',
+				msg: 'An error occurred!',
+				icon: Ext.MessageBox.ERROR,
+				buttons: Ext.MessageBox.OK
 			});
 		};
 		//worker.postMessage(JSON.stringify({
@@ -466,7 +471,7 @@ Ext.onReady(function() {
 			});
 			dumpWindow.show();
 		}
-		var runningWindow = Ext.create('widget.window', {
+		runningWindow = Ext.create('widget.window', {
 			title: 'Running konoha, please wait...',
 			width: 300,
 			height: 100,
