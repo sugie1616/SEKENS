@@ -1,5 +1,22 @@
 /* for Web Workers */
 
+var globalFileURL;
+
+function checkState(success_callback) {
+	var success = success_callback || function(e) {};
+	var xhr = new XMLHttpRequest();
+	xhr.open('GET', globalFileURL, false);
+	xhr.send(null);
+	var state = xhr.responseText;
+	while (state.indexOf('stop') >= 0) {
+		/* sleep */
+		for (var i = 0; i < 1000000000; i++) {}
+		xhr.open('GET', globalFileURL, false);
+		xhr.send(null);
+		state = xhr.responseText;
+	}
+}
+
 var elem = function(elemname) {
 	this.nodeName = elemname;
 	this._attributes = [];

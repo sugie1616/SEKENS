@@ -29,6 +29,60 @@ Ext.apply(Ext.form.field.VTypes, {
 var editorPanel;
 var documentJson;
 
+var createObjectURL = window.URL && window.URL.createObjectURL
+? function (file) { return window.URL.createObjectURL (file); }
+: window.webkitURL && window.webkitURL.createObjectURL
+? function (file) { return window.webkitURL.createObjectURL (file); }
+: undefined;
+
+function errorHandler() {
+	console.log('error!');
+}
+
+function readState(read_callback) {
+	window.requestFileSystem(window.TEMPORARY, 4/* 4b */, function(fs) {
+		fs.root.getFile('state.txt', {create: true, exclusive: false}, function(entry) {
+			/* read */
+			entry.file(function(file) {
+				var reader = new FileReader();
+				reader.onloadend = function(e) {
+					read_callback = read_callback || function(r) {};
+					read_callback(this.result);
+					//console.log(this.result);
+				}
+				reader.readAsText(file);
+			}, errorHandler);
+		}, errorHandler);
+	}, errorHandler);
+}
+
+function writeState(state, callback) {
+	callback = callback || function(e) {};
+	window.requestFileSystem(window.TEMPORARY, 4/* 4b */, function(fs) {
+		fs.root.getFile('state.txt', {create: true, exclusive: false}, function(entry) {
+			/* write */
+			entry.createWriter(function(writer) {
+				//writer.onwriteend = function(e) {
+				//	console.log('write success');
+				//};
+
+				entry.file(function (f) {
+					var u = webkitURL || URL;
+					callback(u.createObjectURL(f));
+				});
+
+				var bb = new BlobBuilder();
+				bb.append(state);
+				writer.write(bb.getBlob('text/plain'));
+			}, errorHandler);
+		}, errorHandler);
+	}, errorHandler);
+}
+
+window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
+
+window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder;
+
 Ext.onReady(function() {
 	Ext.tip.QuickTipManager.init();
 	var todo = function() {
@@ -69,26 +123,26 @@ Ext.onReady(function() {
 	var canvasWindow;
 	var dumpWindow;
 	//var showCanvas = function(kctx, width, height) {
-	//	canvasWindow = Ext.create('widget.window', {
-	//			title: 'Canvas',
-	//			width: width + 12,
-	//			height: height + 35,
-	//			html: '<div id="canvas-body"></div>'
-	//	});
-	//	canvasWindow.show();
-	//	Ext.DomHelper.append('canvas-body', {
-	//		id: 'konoha-canvas',
-	//		tag: 'canvas',
-	//		width: width,
-	//		height: height
-	//	});
-	//	var canvas = Ext.getDom('konoha-canvas');
-	//	var ctx = canvas.getContext('2d');
-	//	for (var i = 0; i < kctx['2d'][0]._rect.length; i++) {
-	//		var rect = kctx['2d'][0]._rect[i];
-	//		ctx.fillStyle = rect._style.rawptr;
-	//		ctx.fillRect(rect._x, rect._y, rect._w, rect._h);
-	//	}
+	//      canvasWindow = Ext.create('widget.window', {
+	//                      title: 'Canvas',
+	//                      width: width + 12,
+	//                      height: height + 35,
+	//                      html: '<div id="canvas-body"></div>'
+	//      });
+	//      canvasWindow.show();
+	//      Ext.DomHelper.append('canvas-body', {
+	//              id: 'konoha-canvas',
+	//              tag: 'canvas',
+	//              width: width,
+	//              height: height
+	//      });
+	//      var canvas = Ext.getDom('konoha-canvas');
+	//      var ctx = canvas.getContext('2d');
+	//      for (var i = 0; i < kctx['2d'][0]._rect.length; i++) {
+	//              var rect = kctx['2d'][0]._rect[i];
+	//              ctx.fillStyle = rect._style.rawptr;
+	//              ctx.fillRect(rect._x, rect._y, rect._w, rect._h);
+	//      }
 	//};
 	var showValues = function(values) {
 		for (var v in values) {
@@ -396,27 +450,53 @@ Ext.onReady(function() {
 		//	async: true,
 		//	interval: 1000
 		//}));
-		worker.postMessage(JSON.stringify({
-			type: 'start'
-		}));
+		writeState('runn', function(fileURL) {
+			worker.postMessage(JSON.stringify({
+				type: 'start',
+				url: fileURL
+			}));
+		});
 		if (rundebug == true) {
 			dumpWindow = Ext.create('widget.window', {
 				title: 'Values',
-				width: 200,
+				width: 214,
 				height: 400,
+				layout: 'fit',
 				html: '<ul id="dumpul"></ul>'
 			});
 			dumpWindow.show();
 		}
-		Ext.MessageBox.show({
-			msg: 'Running konoha, please wait...',
-			progressText: 'Running...',
-			buttons: Ext.MessageBox.CANCEL,
-			fn: function(btn) {
-				worker.terminate();
-			},
-			icon: 'konoha-running'
+		var runningWindow = Ext.create('widget.window', {
+			title: 'Running konoha, please wait...',
+			width: 300,
+			height: 100,
+			buttons: [{
+				text: 'Stop',
+				id: 'stop-btn',
+				handler: function() {
+					writeState('stop');
+					this.nextNode().setDisabled(false);
+					this.setDisabled(true);
+				}
+			}, {
+				text: 'Continue',
+				id: 'cont-btn',
+				disabled: true,
+				handler: function() {
+					writeState('runn');
+					this.previousNode().setDisabled(false);
+					this.setDisabled(true);
+				}
+			}, {
+				text: 'Terminate',
+				id: 'term-btn',
+				handler: function() {
+					worker.terminate();
+					runningWindow.hide();
+				}
+			}]
 		});
+		runningWindow.show();
 	};
 	var loadScript = function(title, name, type, success_func) {
 		Ext.Ajax.request({
