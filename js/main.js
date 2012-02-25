@@ -476,10 +476,10 @@ Ext.onReady(function() {
 			width: 300,
 			height: 100,
 			buttons: [{
-				text: 'Stop',
-				id: 'stop-btn',
+				text: 'Pause',
+				id: 'pause-btn',
 				handler: function() {
-					writeState('stop');
+					writeState('pause');
 					this.nextNode().setDisabled(false);
 					this.setDisabled(true);
 				}
@@ -488,7 +488,7 @@ Ext.onReady(function() {
 				id: 'cont-btn',
 				disabled: true,
 				handler: function() {
-					writeState('runn');
+					writeState('run');
 					this.previousNode().setDisabled(false);
 					this.setDisabled(true);
 				}
