@@ -8,7 +8,7 @@ function checkState(success_callback) {
 	xhr.open('GET', globalFileURL, false);
 	xhr.send(null);
 	var state = xhr.responseText;
-	while (state.indexOf('stop') >= 0) {
+	while (state.indexOf('pause') >= 0) {
 		/* sleep */
 		for (var i = 0; i < 1000000000; i++) {}
 		xhr.open('GET', globalFileURL, false);
