@@ -455,7 +455,7 @@ Ext.onReady(function() {
 		//	async: true,
 		//	interval: 1000
 		//}));
-		writeState('runn', function(fileURL) {
+		writeState('run', function(fileURL) {
 			worker.postMessage(JSON.stringify({
 				type: 'start',
 				url: fileURL
@@ -477,26 +477,22 @@ Ext.onReady(function() {
 			height: 100,
 			buttons: [{
 				text: 'Pause',
-				id: 'pause-btn',
+				id: 'pause-cont-btn',
 				handler: function() {
-					writeState('pause');
-					this.nextNode().setDisabled(false);
-					this.setDisabled(true);
-				}
-			}, {
-				text: 'Continue',
-				id: 'cont-btn',
-				disabled: true,
-				handler: function() {
-					writeState('run');
-					this.previousNode().setDisabled(false);
-					this.setDisabled(true);
+					if (this.getText() == 'Pause') {
+						writeState('pause');
+						this.setText('Continue');
+					} else if (this.getText() == 'Continue') {
+						writeState('run');
+						this.setText('Pause');
+					}
 				}
 			}, {
 				text: 'Terminate',
 				id: 'term-btn',
 				handler: function() {
 					worker.terminate();
+					writeState('wait');
 					runningWindow.hide();
 				}
 			}]
